@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#./watch.sh $PATH $COMMAND
-
 chsum1=""
 
 while [[ true ]]
