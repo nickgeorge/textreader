@@ -1,0 +1,94 @@
+{namespace listpage}
+
+/**
+ * Main template for ListPage.js.
+ * @param contexts List page data.
+ * @param books All books.
+ * @param bookId The id of the book being searched.
+ * @param word The word being searched for.
+ */
+{template .main}
+  <div id="search-bar-container">
+    {call .searchbar}
+      {param books: $books /}
+      {param initialBookId: $bookId /}
+      {param initialWord: $word /}
+    {/call}
+  </div>
+  <div id="contexts-container">
+    {call .titleboard}
+      {param book: $books[$bookId] /}
+      {param word: $word /}
+    {/call}
+    {foreach $context in $contexts}
+      <div class="context-section" id="context-section-{$context.token.position}"
+      data-position="{$context.token.position}" >
+      {call .context}
+        {param context: $context /}
+      {/call}
+      </div>
+    {/foreach}
+  </div>
+  <div id="hovercards"></div>
+{/template}
+
+/**
+ * @param books All books.
+ * @param initialBookId Initial bookId.
+ * @param initialWord Initial word.
+ */
+{template .searchbar}
+  <div id="search-bar">
+    <select id="search-bar-book-select">
+      {foreach $bookId in keys($books)}
+        {let $book: $books[$bookId] /}
+        {let $selected: $initialBookId == $book.id ? 'selected' : '' /}
+        <option value="{$book.id}" {$selected}>{$book.title}</option>
+      {/foreach}
+    </select>
+    <input  id="search-bar-word-input" type='text' value='{$initialWord}'></input>
+    <button id="search-bar-button">Search</button>
+  </div>
+{/template}
+
+/**
+ * @param book Current book.
+ * @param word Current word
+ */
+{template .titleboard}
+  <div class="titleboard">
+    <div class="titleboard-text">
+      Showing [<span class="keyword">{$word}</span>] in{sp}
+      <span class="hoverable book-title" data-title="{$book.title}">
+        {$book.title}
+      </span>
+      , by {$book.author}
+    </div>
+  </div>
+{/template}
+
+/**
+ * Template for context section
+ * @param context The context data for this section.
+ */
+{template .context}
+  <div class="context-section-expander expander-top"
+      data-position="{$context.token.position}"
+      data-before="{length($context.before)}"
+      data-after="{length($context.after)}"></div>
+  <div class="context-section-text">
+    ...
+    {foreach $token in $context.before}
+      {$token.raw}{sp}
+    {/foreach}
+    <span class="keyword">{$context.token.raw}</span> {sp}
+    {foreach $token in $context.after}
+      {$token.raw}{sp}
+    {/foreach}
+    ...
+  </div>
+  <div class="context-section-expander expander-bottom"
+      data-position="{$context.token.position}"
+      data-before="{length($context.before)}"
+      data-after="{length($context.after)}"></div>
+{/template}
