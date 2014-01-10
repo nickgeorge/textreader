@@ -5,22 +5,22 @@ import cgi, cgitb
 import json
 import document
 import chunker
-import flaftypes
-import flafutil
+import flaf_types
+import flaf_util
 cgitb.enable()
 
 form = cgi.FieldStorage()
 word = form.getvalue('word') or 'windmills'
 bookId = int(form.getvalue('bookId') or 2)
 
-conn = flafutil.newConn()
+conn = flaf_util.newConn()
 cursor = conn.cursor()
 
 cursor.execute('SELECT position,word,raw FROM word_index ' +
     'WHERE book_id=%s AND word="%s"' % (bookId, word))
 hitTokens = []
 for row in cursor.fetchall():
-  hitTokens.append(flaftypes.readToken(row))
+  hitTokens.append(flaf_types.readToken(row))
 
 data = {}
 
@@ -38,7 +38,7 @@ data['books'] = {};
 
 cursor.execute('SELECT book_id, title, author FROM books')
 for row in cursor.fetchall():
-  book = flaftypes.readBook(row)
+  book = flaf_types.readBook(row)
   data['books'][row[0]] = book
 
 doc = document.Document()

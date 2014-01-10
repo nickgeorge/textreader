@@ -6,5 +6,5 @@ import MySQLdb
 import json
 import document
 import chunker
-import flaftypes
-import flafutil
+import flaf_types
+import flaf_util

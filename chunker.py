@@ -1,4 +1,4 @@
-import flaftypes
+import flaf_types
 import cgitb
 cgitb.enable()
 
@@ -15,7 +15,7 @@ class Chunker:
         'ORDER BY position')
     tokens = []
     for row in self.cursor.fetchall():
-      tokens.append(flaftypes.readToken(row))
+      tokens.append(flaf_types.readToken(row))
 
     return tokens
 

@@ -5,7 +5,7 @@ import cgi, cgitb
 import json
 import re
 import document
-import flafutil
+import flaf_util
 cgitb.enable()
 
 class Indexer:
@@ -57,7 +57,7 @@ class Indexer:
 def main(argv):
   optsList = getopt.getopt(argv, [], ['title=' ,'author=', 'path='])[0]
   opts = dict(optsList)
-  indexer = Indexer(flafutil.newConn())
+  indexer = Indexer(flaf_util.newConn())
   bookId = indexer.addToBooks(opts['--title'], opts['--author'], opts['--path'])
   indexer.addToWordIndex(bookId)
 

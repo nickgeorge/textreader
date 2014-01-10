@@ -3,13 +3,13 @@
 import MySQLdb
 import cgi, cgitb
 import re
-import flafutil
+import flaf_util
 
 form = cgi.FieldStorage()
 title = form.getvalue('title')
 title = 'Bartleby the Scrivener' if not bool(title) else title
 
-cur = flafutil.newConn().cursor()
+cur = flaf_util.newConn().cursor()
 cur.execute('DELETE FROM word_index WHERE title="' + title + '"')
 db.commit()
 cur.execute('SELECT text FROM rawtext where title="' + title + '"')
