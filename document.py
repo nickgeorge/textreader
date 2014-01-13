@@ -10,11 +10,13 @@ class Document:
     self.requiredFiles = []
     self.css = []
     self.bodyLines = []
-  def require(self, filename):
+  def requireFile(self, filename):
     if filename not in self.requiredFiles:
       self.requiredFiles.append(filename)
+  def requireJs(self, filename):
+    self.requireFile(filename)
   def requireSoy(self, filename):
-    self.require('bin/' + filename + '.js')
+    self.requireFile(filename + '.js')
   def addCss(self, filename):
     self.css.append(filename)
   def bodyLine(self, line):
@@ -25,9 +27,9 @@ class Document:
     print('<html>')
     print('  <head>')
     for filename in self.css:
-      print('    <link rel="stylesheet" type="text/css" href="' + filename + '">')
+      print('    <link rel="stylesheet" type="text/css" href="/' + filename + '">')
     for filename in self.requiredFiles:
-      print('    <script src="' + filename + '"></script>')
+      print('    <script src="/' + filename + '"></script>')
     print('  </head>')
     print('  <body>')
     for line in self.bodyLines:

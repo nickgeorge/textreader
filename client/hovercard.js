@@ -1,47 +1,95 @@
-Hovercard = function(anchor) {
-  this.anchor = anchor;
+Hovercard = function() {
   this.isHovered = false;
   this.isInContent = false;
   this.isVisible = false;
+  this.anchor = null;
+  this.contentElement = document.createElement('div');
 
-  this.contentDiv = document.createElement('div');
-  $(this.contentDiv).addClass('hovercard-container');
-  $(this.contentDiv).hide();
-  this.contentDiv.innerHTML = hovercard.main();
-  $('#hovercards').append(this.contentDiv);
+  $(this.contentElement).addClass('hovercard');
+  $(this.contentElement).hide();
+  if ($('#hovercards').length == 0) {
+    var hovercardsDiv = document.createElement('div');
+    hovercardsDiv.id = 'hovercards';
+    document.body.appendChild(hovercardsDiv);
+  }
+  $('#hovercards').append(this.contentElement);
 
-  $(this.contentDiv).hover(Util.bind(this.onContentDivHover, this));
-  $(anchor).hover(Util.bind(this.onHover, this));
 
+  Hovercard.instances.push(this);
+};
+
+Hovercard.instances = [];
+
+Hovercard.prototype.showOnHover = function(selector) {
+  $(this.contentElement).hover(Util.bind(this.onContentHover, this));
+  $(selector).hover(Util.bind(this.onHover, this));
+};
+
+Hovercard.prototype.showOnClick = function(selector) {
+  $(document.body).click(Util.bind(this.onClick, this));
+};
+
+Hovercard.prototype.setContent = function(component) {
+  component.render(this.contentElement);
+  return this;
 };
 
 Hovercard.prototype.onHover = function(event) {
+  var isSameElement = event.target == this.anchor;
   if (event.type == 'mouseenter') {
-    this.isHovered = true;
-    if (this.isVisible) return;
-    this.isVisible = true;
-    $(this.contentDiv).show();
-    $(this.contentDiv).css('top', $(event.target).offset().top + $(event.target).height());
-    $(this.contentDiv).css('left', $(event.target).offset().left);
-  } else {
-    this.isHovered = false;
-    setTimeout(Util.bind(this.maybeHide, this), 150);
+    if (this.isVisible) {
+      if (isSameElement) {
+        this.isHovered = true;
+        return;
+      }
+      this.hide();
+    }
+    this.anchor = event.target;
+    this.show();
+  } else if (isSameElement){
+      this.isHovered = false;
+      setTimeout(Util.bind(this.maybeHide, this), 75);
   }
 };
 
-Hovercard.prototype.onContentDivHover = function(event) {
+Hovercard.prototype.onContentHover = function(event) {
   if (event.type == 'mouseenter') {
     this.isInContent = true;
   } else {
     this.isInContent = false;
-    $(this.contentDiv)
-    setTimeout(Util.bind(this.maybeHide, this), 150);
+    setTimeout(Util.bind(this.maybeHide, this), 75);
   }
+};
+
+Hovercard.prototype.onClick = function(event) {
+  this.hide();
+  if ($(event.target).hasClass('word-count-word')) {
+    this.anchor = event.target;
+    this.show();
+  }
+};
+
+Hovercard.prototype.show = function() {
+  this.isHovered = true;
+  if (this.isVisible) return;
+  //$('.hovercard').hide();
+  this.isVisible = true;
+  $(this.contentElement).show();
+  var offset = $(this.anchor).offset();
+  $(this.contentElement).css('top', offset.top + $(this.anchor).height() - 2);
+  $(this.contentElement).css('left', Math.max(offset.left,
+      Math.min(event.pageX - $(this.contentElement).width()/4,
+          offset.left + $(this.anchor).width() - $(this.contentElement).width())));
+};
+
+Hovercard.prototype.hide = function() {
+  $(this.contentElement).hide();
+  this.isVisible = false;
+  this.anchor = null;
 };
 
 Hovercard.prototype.maybeHide = function() {
   if (!this.isHovered && !this.isInContent) {
-    $(this.contentDiv).hide();
-    this.isVisible = false;
+    this.hide();
   }
 };

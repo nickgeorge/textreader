@@ -22,16 +22,22 @@ ListPage.prototype.render = function(contentDiv) {
       Util.bind(this.onSearchButtonClicked, this));
 
   var page = this;
-  $('#search-bar-word-input').keypress(function(event) {
+  $('#search-bar-word-input').keypress(Util.bind(function(event) {
     if (event.keyCode == 13) {
       page.onSearchButtonClicked();
     }
-  });
+  }, this));
 
-  $('.book-title').each(function(index, element) {
-    new Hovercard(element);
-  });
-
+  new Hovercard().setContent(
+      new Menu([
+        {
+          text: 'Show Word Index',
+          action: function(){
+            window.location.href =
+                '/textreader/wordcount?bookId=' + page.bookId;
+          },
+        }
+      ])).showOnHover($('.book-title'));
 };
 
 ListPage.prototype.onExpanderClicked = function(event) {
@@ -95,7 +101,7 @@ ListPage.prototype.onGetContext = function(isUpExpand, data) {
 ListPage.prototype.onSearchButtonClicked = function() {
   var bookId = $('#search-bar-book-select').find(":selected").val();
   var word = $('#search-bar-word-input').val();
-  window.location.href = 'context.cgi?bookId=' + bookId + '&word=' + word;
+  window.location.href = '/textreader?bookId=' + bookId + '&word=' + word;
 };
 
 ListPage.prototype.shift = function(delta) {

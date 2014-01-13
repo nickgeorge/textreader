@@ -41,25 +41,46 @@ class Indexer:
     # of letters,
     wordlikePattern = re.compile('[A-Za-z\']+')
 
+    counts = {}
+    indexArray = [];
     for position, token in enumerate(tokens):
       wordMatch = wordlikePattern.search(token)
       word = token if not bool(wordMatch) else wordMatch.group(0).lower()
-      self.cursor.execute('INSERT INTO word_index (word, book_id, position, raw) '
-          'VALUES ("%s", "%s", %s, "%s")' % (
-              self.conn.escape_string(word),
-              bookId,
-              position,
-              self.conn.escape_string(token)
-          ))
+      escapedWord = self.conn.escape_string(word)
+
+      if escapedWord in counts:
+        counts[escapedWord] += 1
+      else:
+        counts[escapedWord] = 1
+
+
+      indexArray.append((
+          escapedWord,
+          bookId,
+          position,
+          self.conn.escape_string(token)
+      ))
+
+    countsArray = []
+    for word in counts:
+      countsArray.append(
+          (bookId, self.conn.escape_string(word), counts[word]))
+
+    # self.cursor.execute('INSERT INTO word_index (word, book_id, position, raw) VALUES ' +
+    #     ', '.join(map(str, indexArray)))
+    self.cursor.execute('INSERT INTO word_counts (book_id, word, count) VALUES ' +
+        ', '.join(map(str, countsArray)))
+
+    # print('INSERT INTO word_counts (book_id, word, count) VALUES ' +
+    #     ', '.join(map(str, countsArray)))
     self.conn.commit()
 
-
 def main(argv):
-  optsList = getopt.getopt(argv, [], ['title=' ,'author=', 'path='])[0]
-  opts = dict(optsList)
+  # optsList = getopt.getopt(argv, [], ['title=' ,'author=', 'path='])[0]
+  # opts = dict(optsList)
   indexer = Indexer(flaf_util.newConn())
-  bookId = indexer.addToBooks(opts['--title'], opts['--author'], opts['--path'])
-  indexer.addToWordIndex(bookId)
+  # bookId = indexer.addToBooks(opts['--title'], opts['--author'], opts['--path'])
+  indexer.addToWordIndex(13)
 
 if __name__ == "__main__":
    main(sys.argv[1:])

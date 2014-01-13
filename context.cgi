@@ -43,13 +43,14 @@ for row in cursor.fetchall():
 
 doc = document.Document()
 
-doc.require('list_page.js')
-doc.require('hovercard.js')
+doc.requireJs('list_page.js')
 doc.requireSoy('list_page.soy')
-doc.requireSoy('hovercard.soy')
-doc.require('soyutils.js')
-doc.require('util.js')
-doc.require('jquery/1.10.2/jquery.min.js')
+doc.requireJs('hovercard.js')
+doc.requireJs('menu.js')
+doc.requireSoy('menu.soy')
+doc.requireJs('soy/soyutils.js')
+doc.requireJs('utils/util.js')
+doc.requireJs('utils/jquery/1.10.2/jquery.min.js')
 doc.addCss('style.css')
 
 doc.bodyLine('<div id="main-content"></div>')
