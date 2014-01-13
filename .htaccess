@@ -1,0 +1,12 @@
+RewriteEngine on
+RewriteRule ^textreader/wordcount$ word_count.cgi [L]
+RewriteRule ^textreader(/.*)?$ context.cgi [L]
+
+
+RewriteCond   %{REQUEST_URI}   !.*soy\.js
+RewriteCond   %{REQUEST_URI}   !/client/*
+RewriteRule ^(.*\.(js|css))$ /client/$1 [L]
+
+RewriteCond   %{REQUEST_URI}   !/bin/*
+RewriteRule ^(.*\.soy\.js)$ /bin/$1 [L]
+

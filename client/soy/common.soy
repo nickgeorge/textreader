@@ -1,0 +1,35 @@
+{namespace common.templates}
+
+
+
+/**
+ * @param books All books.
+ * @param initialBookId Initial bookId.
+ * @param initialWord Initial word.
+ */
+{template .searchbar}
+  <div id="search-bar">
+    <select id="search-bar-book-select">
+      {foreach $bookId in keys($books)}
+        {let $book: $books[$bookId] /}
+        {let $selected: $initialBookId == $book.id ? 'selected' : '' /}
+        <option value="{$book.id}" {$selected}>{$book.title}</option>
+      {/foreach}
+    </select>
+    <input  id="search-bar-word-input" type='text' value='{$initialWord}'></input>
+    <button id="search-bar-button">Search</button>
+  </div>
+{/template}
+
+
+
+/**
+ * @param contents Contents of the titleboard.
+ */
+{template .titleboard}
+  <div class="titleboard">
+    <div class="titleboard-text">
+      {$contents |noAutoescape}
+    </div>
+  </div>
+{/template}
