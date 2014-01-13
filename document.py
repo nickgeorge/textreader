@@ -26,6 +26,7 @@ class Document:
     writeHeader()
     print('<html>')
     print('  <head>')
+    print('<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">')
     for filename in self.css:
       print('    <link rel="stylesheet" type="text/css" href="/' + filename + '">')
     for filename in self.requiredFiles:

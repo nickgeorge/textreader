@@ -3,9 +3,9 @@
 import sys
 import cgi, cgitb
 import json
-import chunker
+import flaf_db
 import document
-import flaf_util
+
 cgitb.enable()
 
 
@@ -15,9 +15,9 @@ numBefore = int(form.getvalue('beforeCount'))
 numAfter = int(form.getvalue('afterCount'))
 bookId = form.getvalue('bookId')
 
-chunker = chunker.Chunker(flaf_util.newConn(), bookId)
+dbDao = flaf_db.DbDao(flaf_db.newConn(), bookId)
 
 document.writeJsonHeader()
-sys.stdout.write(json.dumps(chunker.getContext(position, numBefore, numAfter)))
+sys.stdout.write(json.dumps(dbDao.getContext(position, numBefore, numAfter)))
 
 

@@ -110,7 +110,7 @@ a {
 }
 
 
-.word-count-container {
+.word-counts-container {
   background-color: white;
   max-width: 750px;
   margin: 40px auto 40px auto;
@@ -120,14 +120,18 @@ a {
 
 .word-count-bar {
   display: inline-block;
-  background-color: lightblue;
+  background-color: #e8e8e8;
   margin: 0px 0 3px 0;
   box-shadow: 1px 1px 1px #888888;
   position: relative;
 }
 
+.word-count-container:nth-child(2n) .word-count-bar {
+  background-color: skyblue;
+}
+
 .word-count-word {
-  margin-left: 3px;
+  margin: 2px 0 1px 4px;
   color: darkblue;
   display: inline-block;
 }
@@ -146,6 +150,6 @@ a {
   top: 10px
 }
 
-.word-count-boundry {
+.word-count-container {
   position: relative;
 }

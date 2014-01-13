@@ -32,7 +32,9 @@ common = [
   "but",
   "from",
   "which",
-  "but"
+  "but",
+  "-",
+  "--"
 ]
 
 

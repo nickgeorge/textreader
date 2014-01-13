@@ -5,7 +5,7 @@ import cgi, cgitb
 import json
 import re
 import document
-import flaf_util
+
 cgitb.enable()
 
 class Indexer:
@@ -35,7 +35,7 @@ class Indexer:
     # non-whitespace characters, OR a consecutive string of hyphens.
     # The hypens are necessary because-and this is a demonstration-use hypens
     # w
-    tokens =  re.findall('-+|[^\s]+', rawtext)
+    tokens =  re.findall('-+|[^\s-]+', rawtext)
 
     # build pattern for 'words' where a word is defined to be a consecutive string
     # of letters,
@@ -63,24 +63,27 @@ class Indexer:
 
     countsArray = []
     for word in counts:
+      if (len(word) > 30):
+        print(word)
       countsArray.append(
           (bookId, self.conn.escape_string(word), counts[word]))
 
-    # self.cursor.execute('INSERT INTO word_index (word, book_id, position, raw) VALUES ' +
-    #     ', '.join(map(str, indexArray)))
+    totalWords = len(indexArray)
+    for i in range(0, totalWords, 100000):
+      print(i)
+      self.cursor.execute('INSERT INTO word_index (word, book_id, position, raw) VALUES ' +
+          ', '.join(map(str, indexArray[i:min(i + 100000, totalWords)])))
     self.cursor.execute('INSERT INTO word_counts (book_id, word, count) VALUES ' +
         ', '.join(map(str, countsArray)))
 
-    # print('INSERT INTO word_counts (book_id, word, count) VALUES ' +
-    #     ', '.join(map(str, countsArray)))
     self.conn.commit()
 
 def main(argv):
-  # optsList = getopt.getopt(argv, [], ['title=' ,'author=', 'path='])[0]
-  # opts = dict(optsList)
-  indexer = Indexer(flaf_util.newConn())
-  # bookId = indexer.addToBooks(opts['--title'], opts['--author'], opts['--path'])
-  indexer.addToWordIndex(13)
+  optsList = getopt.getopt(argv, [], ['title=' ,'author=', 'path='])[0]
+  opts = dict(optsList)
+  indexer = Indexer(flaf_db.newConn())
+  bookId = indexer.addToBooks(opts['--title'], opts['--author'], opts['--path'])
+  indexer.addToWordIndex(bookId)
 
 if __name__ == "__main__":
    main(sys.argv[1:])

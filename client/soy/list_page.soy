@@ -1,4 +1,4 @@
-{namespace listpage}
+{namespace listpage.templates}
 
 /**
  * Main template for ListPage.js.
@@ -9,7 +9,7 @@
  */
 {template .main}
   <div id="search-bar-container">
-    {call .searchbar}
+    {call common.templates.searchbar}
       {param books: $books /}
       {param initialBookId: $bookId /}
       {param initialWord: $word /}
@@ -33,38 +33,19 @@
 {/template}
 
 /**
- * @param books All books.
- * @param initialBookId Initial bookId.
- * @param initialWord Initial word.
- */
-{template .searchbar}
-  <div id="search-bar">
-    <select id="search-bar-book-select">
-      {foreach $bookId in keys($books)}
-        {let $book: $books[$bookId] /}
-        {let $selected: $initialBookId == $book.id ? 'selected' : '' /}
-        <option value="{$book.id}" {$selected}>{$book.title}</option>
-      {/foreach}
-    </select>
-    <input  id="search-bar-word-input" type='text' value='{$initialWord}'></input>
-    <button id="search-bar-button">Search</button>
-  </div>
-{/template}
-
-/**
  * @param book Current book.
  * @param word Current word
  */
 {template .titleboard}
-  <div class="titleboard">
-    <div class="titleboard-text">
+  {call common.templates.titleboard}
+    {param contents}
       Showing [<span class="keyword">{$word}</span>] in{sp}
       <span class="hoverable book-title" data-title="{$book.title}">
         {$book.title}
       </span>
       , by {$book.author}
-    </div>
-  </div>
+    {/param}
+  {/call}
 {/template}
 
 /**

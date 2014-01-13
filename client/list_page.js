@@ -8,7 +8,7 @@ ListPage = function(data) {
 
 ListPage.prototype.render = function(contentDiv) {
   this.contentDiv = contentDiv;
-  this.contentDiv.innerHTML = listpage.main({
+  this.contentDiv.innerHTML = listpage.templates.main({
     contexts: this.contexts,
     bookId: this.bookId,
     word: this.word,
@@ -28,16 +28,15 @@ ListPage.prototype.render = function(contentDiv) {
     }
   }, this));
 
-  new Hovercard().setContent(
-      new Menu([
-        {
-          text: 'Show Word Index',
-          action: function(){
-            window.location.href =
-                '/textreader/wordcount?bookId=' + page.bookId;
-          },
-        }
-      ])).showOnHover($('.book-title'));
+  new Hovercard().setContent(new Menu([
+    {
+      text: 'Show Word Index',
+      action: function(){
+        window.location.href =
+            '/textreader/wordcount?bookId=' + page.bookId;
+      },
+    }
+  ])).showOnHover($('.book-title'));
 };
 
 ListPage.prototype.onExpanderClicked = function(event) {
@@ -68,7 +67,7 @@ ListPage.prototype.onGetContext = function(isUpExpand, data) {
   var initialHeight =
       getComputedStyle($(containerId + ' .context-section-text')[0]).height;
 
-  $(containerId)[0].innerHTML = listpage.context({context: data});
+  $(containerId)[0].innerHTML = listpage.templates.context({context: data});
   var textSection = $(containerId + ' .context-section-text')[0];
   textSection.style.height = 'auto';
   var finalHeight = getComputedStyle(textSection).height;

@@ -1,11 +1,11 @@
 #!/usr/bin/python
 
 import cgi, cgitb
-import flaf_util
+
 import word_description
 cgitb.enable()
 
-conn = flaf_util.newConn()
+conn = flaf_db.newConn()
 cursor = conn.cursor()
 cursor.execute('DELETE FROM word_description')
 

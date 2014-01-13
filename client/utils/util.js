@@ -83,6 +83,11 @@ Util.forEach = function(arr, f, opt_obj) {
   }
 };
 
+Util.assertEquals = function(expected, test) {
+  if (expected !== test) throw new Error('Assertion failed: ' +
+      'Expected {' + expected + '} but got {' + test + '}.');
+};
+
 Array.prototype.apply = function(fnString, arg1, arg2, arg3) {
   for (var i = 0, elm; elm = this[i]; i++) {
     elm[fnString](arg1, arg2, arg3);

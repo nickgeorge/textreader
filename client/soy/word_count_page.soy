@@ -1,25 +1,63 @@
-{namespace wordcountpage}
+{namespace wordcountpage.templates}
 
 /**
  * @param wordCounts The word count data.
+ * @param book The current book.
  */
 {template .main}
-  <div class="word-count-container">
-    {foreach $word in $wordCounts}
-      <div class="word-count-boundry">
-        <span class="word-count-ruler"></span>
-        <span class="word-count-bar">
-          <span class="word-count-word">
-            {$word[0]}
-          </span>
-        </span>
-        <span class="word-count-count">
-          {$word[1]}
-        </span>
-      </div>
-    {/foreach}
+  {call .titleboard}
+    {param book: $book /}
+  {/call}
+  <div class="word-counts-container">
+    {call .wordCountGroup}
+      {param wordCounts: $wordCounts /}
+    {/call}
   </div>
 {/template}
 
+/**
+ * @param wordCounts
+ */
+{template .wordCountGroup}
+  {foreach $wordCount in $wordCounts}
+    {call .wordCount}
+      {param word: $wordCount[0] /}
+      {param count: $wordCount[1] /}
+    {/call}
+  {/foreach}
+{/template}
 
- /* @param totalCount  The total word count.*/
+/**
+ * @param word
+ * @param count
+ */
+{template .wordCount}
+  <div class="word-count-container">
+    <span class="word-count-ruler"></span>
+    <span class="word-count-bar">
+      <span class="word-count-word">
+        {$word}
+      </span>
+    </span>
+    <span class="word-count-count">
+      {$count}
+    </span>
+  </div>
+{/template}
+
+/**
+ * @param book
+ */
+{template .titleboard}
+  {call common.templates.titleboard}
+    {param contents}
+      Showing word counts for{sp}
+      <span class="hoverable book-title" data-title="{$book.title}">
+        {$book.title}
+      </span>
+      , by {$book.author}
+    {/param}
+  {/call}
+{/template}
+
+
