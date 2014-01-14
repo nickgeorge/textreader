@@ -20,4 +20,3 @@ dbDao = flaf_db.DbDao(flaf_db.newConn(), bookId)
 document.writeJsonHeader()
 sys.stdout.write(json.dumps(dbDao.getContext(position, numBefore, numAfter)))
 
-

@@ -13,6 +13,7 @@ Hovercard = function() {
     document.body.appendChild(hovercardsDiv);
   }
   $('#hovercards').append(this.contentElement);
+  $(this.contentElement).hover(Util.bind(this.onContentHover, this));
 
 
   Hovercard.instances.push(this);
@@ -20,9 +21,8 @@ Hovercard = function() {
 
 Hovercard.instances = [];
 
-Hovercard.prototype.showOnHover = function(selector) {
-  $(this.contentElement).hover(Util.bind(this.onContentHover, this));
-  $(selector).hover(Util.bind(this.onHover, this));
+Hovercard.prototype.showOnHover = function(selectorOrJquery) {
+  $(selectorOrJquery).hover(Util.bind(this.onHover, this));
 };
 
 Hovercard.prototype.showOnClick = function(selector) {
@@ -76,7 +76,10 @@ Hovercard.prototype.show = function() {
   this.isVisible = true;
   $(this.contentElement).show();
   var offset = $(this.anchor).offset();
-  $(this.contentElement).css('top', offset.top + $(this.anchor).height() - 2);
+
+  console.log(offset.top +" : " + $(this.anchor).height() +" : " + $(window).scrollTop())
+  $(this.contentElement).css('top',
+      offset.top + $(this.anchor).height() - 2 - $(window).scrollTop());
   $(this.contentElement).css('left', Math.max(offset.left,
       Math.min(event.pageX - $(this.contentElement).width()/4,
           offset.left + $(this.anchor).width() - $(this.contentElement).width())));

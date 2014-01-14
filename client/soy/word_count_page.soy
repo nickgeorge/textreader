@@ -5,6 +5,7 @@
  * @param book The current book.
  */
 {template .main}
+  <div id="search-bar-container"></div>
   {call .titleboard}
     {param book: $book /}
   {/call}
@@ -17,12 +18,14 @@
 
 /**
  * @param wordCounts
+ * @param? startIndex
  */
 {template .wordCountGroup}
   {foreach $wordCount in $wordCounts}
     {call .wordCount}
       {param word: $wordCount[0] /}
       {param count: $wordCount[1] /}
+      {param startIndex: $startIndex /}
     {/call}
   {/foreach}
 {/template}
@@ -30,9 +33,10 @@
 /**
  * @param word
  * @param count
+ * @param? startIndex
  */
 {template .wordCount}
-  <div class="word-count-container">
+  <div class="word-count-container word-count-batch-{$startIndex ?: 0}">
     <span class="word-count-ruler"></span>
     <span class="word-count-bar">
       <span class="word-count-word">

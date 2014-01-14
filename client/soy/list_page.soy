@@ -8,13 +8,7 @@
  * @param word The word being searched for.
  */
 {template .main}
-  <div id="search-bar-container">
-    {call common.templates.searchbar}
-      {param books: $books /}
-      {param initialBookId: $bookId /}
-      {param initialWord: $word /}
-    {/call}
-  </div>
+  <div id="search-bar-container"></div>
   <div id="contexts-container">
     {call .titleboard}
       {param book: $books[$bookId] /}

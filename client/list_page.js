@@ -3,38 +3,31 @@ ListPage = function(data) {
   this.word = data.word;
   this.contexts = data.contexts;
   this.books = data.books;
-  this.contentDiv = null;
+  this.contentElm = null;
 };
 
-ListPage.prototype.render = function(contentDiv) {
-  this.contentDiv = contentDiv;
-  this.contentDiv.innerHTML = listpage.templates.main({
+ListPage.prototype.render = function(contentElm) {
+  this.contentElm = contentElm;
+  this.contentElm.innerHTML = listpage.templates.main({
     contexts: this.contexts,
     bookId: this.bookId,
     word: this.word,
     books: this.books
   });
 
+  Searchbar.init(this.books, this.bookId, this.word);
+
   $('.context-section-expander').click(
       Util.bind(this.onExpanderClicked, this));
 
-  $('#search-bar-button').click(
-      Util.bind(this.onSearchButtonClicked, this));
-
   var page = this;
-  $('#search-bar-word-input').keypress(Util.bind(function(event) {
-    if (event.keyCode == 13) {
-      page.onSearchButtonClicked();
-    }
-  }, this));
-
   new Hovercard().setContent(new Menu([
     {
       text: 'Show Word Index',
-      action: function(){
+      action: Util.bind(function(){
         window.location.href =
-            '/textreader/wordcount?bookId=' + page.bookId;
-      },
+            '/textreader/wordcount?bookId=' + this.bookId;
+      }, this),
     }
   ])).showOnHover($('.book-title'));
 };
@@ -94,13 +87,6 @@ ListPage.prototype.onGetContext = function(isUpExpand, data) {
 
   $(containerId + ' .context-section-expander').click(
       Util.bind(this.onExpanderClicked, this));
-};
-
-
-ListPage.prototype.onSearchButtonClicked = function() {
-  var bookId = $('#search-bar-book-select').find(":selected").val();
-  var word = $('#search-bar-word-input').val();
-  window.location.href = '/textreader?bookId=' + bookId + '&word=' + word;
 };
 
 ListPage.prototype.shift = function(delta) {

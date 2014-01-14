@@ -3,6 +3,7 @@
 import cgi, cgitb
 
 import word_description
+import flaf_db
 cgitb.enable()
 
 conn = flaf_db.newConn()

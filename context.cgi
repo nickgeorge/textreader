@@ -1,13 +1,14 @@
 #!/usr/bin/python
 
-# Import modules for CGI handling
 import cgi, cgitb
 import json
 import document
 import flaf_db
 import flaf_types
-
+import flaf_tracer
 cgitb.enable()
+
+tracer = flaf_tracer.Tracer('ListPageAction')
 
 form = cgi.FieldStorage()
 word = form.getvalue('word') or 'windmills'
@@ -16,30 +17,40 @@ bookId = int(form.getvalue('bookId') or 2)
 conn = flaf_db.newConn()
 cursor = conn.cursor()
 
-cursor.execute('SELECT position,word,raw FROM word_index ' +
-    'WHERE book_id=%s AND word="%s"' % (bookId, word))
-hitTokens = []
-for row in cursor.fetchall():
-  hitTokens.append(flaf_types.readToken(row))
+tracer.log('made conn')
 
+cursor.execute('SELECT position FROM word_index ' +
+    'WHERE book_id=%s AND word="%s" ' % (bookId, word) +
+    'ORDER BY position ASC')
+
+contextRequests = []
+tracer.log('read hits')
+for row in cursor.fetchall():
+  contextRequests.append({
+    'position': int(row[0]),
+    'numWordsBefore': 25,
+    'numWordsAfter': 25
+  })
+
+
+tracer.log('processed hits, reading contexts')
 
 dbDao = flaf_db.DbDao(conn, bookId)
-unsortedHits = [];
-for token in hitTokens:
-  unsortedHits.append(dbDao.getContext(token['position'], 25, 25))
 
 data = {
   'word': word,
   'bookId': bookId,
   'books': dbDao.getAllBooks(),
-  'contexts': sorted(unsortedHits, key=lambda hit: hit['token']['position'])
+  'contexts': dbDao.getContexts(contextRequests)
 }
+tracer.log('read contexts')
 
 doc = document.Document()
 
 doc.requireJs('list_page.js')
 doc.requireSoy('list_page.soy')
 doc.requireJs('hovercard.js')
+doc.requireJs('searchbar.js')
 doc.requireJs('menu.js')
 doc.requireSoy('menu.soy')
 doc.requireSoy('common.soy')
@@ -56,3 +67,5 @@ doc.bodyLine('  setTimeout(function(){$(\'body\').scrollTop(0);}, 0);')
 doc.bodyLine('</script>')
 
 doc.write()
+
+tracer.log('wrote doc')

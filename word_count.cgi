@@ -4,15 +4,10 @@ import cgi, cgitb
 import json
 import document
 import flaf_db
-import flaf_types
-
-import time
 cgitb.enable()
 
 form = cgi.FieldStorage()
 bookId = int(form.getvalue('bookId') or 4)
-
-startTime = time.time()
 
 conn = flaf_db.newConn()
 dbDao = flaf_db.DbDao(conn, bookId);
@@ -28,6 +23,7 @@ doc = document.Document();
 doc.requireJs('word_count_page.js')
 doc.requireSoy('word_count_page.soy')
 doc.requireJs('hovercard.js')
+doc.requireJs('searchbar.js')
 doc.requireJs('menu.js')
 doc.requireSoy('menu.soy')
 doc.requireSoy('common.soy')

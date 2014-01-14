@@ -10,7 +10,7 @@ Menu.prototype.render = function(element) {
   });
 
   $(this.contentElement).click(Util.bind(function(event) {
-    this.options[$(event.target).attr('data-index')].action();
+    this.options[$(event.target).attr('data-index')].action(event.target);
   }, this));
 };
 

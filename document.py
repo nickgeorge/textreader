@@ -24,6 +24,7 @@ class Document:
 
   def write(self):
     writeHeader()
+    print('<!DOCTYPE html>')
     print('<html>')
     print('  <head>')
     print('<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">')
