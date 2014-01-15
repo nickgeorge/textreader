@@ -72,12 +72,10 @@ Hovercard.prototype.onClick = function(event) {
 Hovercard.prototype.show = function() {
   this.isHovered = true;
   if (this.isVisible) return;
-  //$('.hovercard').hide();
   this.isVisible = true;
   $(this.contentElement).show();
   var offset = $(this.anchor).offset();
 
-  console.log(offset.top +" : " + $(this.anchor).height() +" : " + $(window).scrollTop())
   $(this.contentElement).css('top',
       offset.top + $(this.anchor).height() - 2 - $(window).scrollTop());
   $(this.contentElement).css('left', Math.max(offset.left,

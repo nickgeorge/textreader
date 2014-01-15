@@ -8,7 +8,7 @@ do
     if [[ $chsum1 != $chsum2 ]] ; then
         echo "Recompiling soy..."
         result=$(java -jar ~/Desktop/SoyToJsSrcCompiler.jar \
-            --outputPathFormat bin/{INPUT_FILE_NAME}.js \
+            --outputPathFormat client/soy/gen/{INPUT_FILE_NAME}.js \
             --allowExternalCalls false \
             client/soy/*.soy)
         if [ ! -z "$result" ]; then

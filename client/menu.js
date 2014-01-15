@@ -5,7 +5,7 @@ Menu = function(options) {
 
 Menu.prototype.render = function(element) {
   this.contentElement = element;
-  this.contentElement.innerHTML = menu.main({
+  this.contentElement.innerHTML = menu.templates.main({
     options: this.options
   });
 
