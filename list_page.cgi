@@ -47,6 +47,7 @@ tracer.log('read contexts')
 
 doc = document.Document()
 
+doc.setTitle('Text Reader')
 doc.requireJs('list_page.js')
 doc.requireSoy('list_page.soy')
 doc.requireJs('hovercard.js')

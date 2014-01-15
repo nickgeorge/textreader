@@ -26,7 +26,7 @@ ListPage.prototype.render = function(contentElm) {
       text: 'Show Word Index',
       action: Util.bind(function(){
         window.location.href =
-            '/textreader/wordcount?bookId=' + this.bookId;
+            '/textreader/wordcounts?bookId=' + this.bookId;
       }, this),
     }
   ])).showOnHover($('.book-title'));
