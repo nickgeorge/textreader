@@ -2,10 +2,10 @@
 
 import cgi, cgitb
 import json
-import document
-import flaf_db
-import flaf_types
-import flaf_tracer
+from utils import flaf_db
+from utils import flaf_types
+from utils import flaf_tracer
+from utils import document
 cgitb.enable()
 
 tracer = flaf_tracer.Tracer('ListPageAction')
@@ -24,7 +24,6 @@ cursor.execute('SELECT position FROM word_index ' +
     'ORDER BY position ASC')
 
 contextRequests = []
-tracer.log('read hits')
 for row in cursor.fetchall():
   contextRequests.append({
     'position': int(row[0]),
@@ -32,6 +31,7 @@ for row in cursor.fetchall():
     'numWordsAfter': 25
   })
 
+tracer.log(contextRequests)
 
 tracer.log('processed hits, reading contexts')
 

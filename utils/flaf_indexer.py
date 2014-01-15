@@ -68,13 +68,13 @@ class Indexer:
       countsArray.append(
           (bookId, self.conn.escape_string(word), counts[word]))
 
-    totalWords = len(indexArray)
-    for i in range(0, totalWords, 100000):
-      print(i)
-      self.cursor.execute('INSERT INTO word_index (word, book_id, position, raw) VALUES ' +
-          ', '.join(map(str, indexArray[i:min(i + 100000, totalWords)])))
     self.cursor.execute('INSERT INTO word_counts (book_id, word, count) VALUES ' +
         ', '.join(map(str, countsArray)))
+
+    totalWords = len(indexArray)
+    for i in range(0, totalWords, 100000):
+      self.cursor.execute('INSERT INTO word_index (word, book_id, position, raw) VALUES ' +
+          ', '.join(map(str, indexArray[i:min(i + 100000, totalWords)])))
 
     self.conn.commit()
 

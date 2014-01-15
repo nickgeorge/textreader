@@ -1,7 +1,7 @@
 import flaf_types
 import cgitb
 import MySQLdb
-import flaf_tracer
+from utils import flaf_tracer
 cgitb.enable()
 
 def newConn():
@@ -58,6 +58,7 @@ class DbDao:
 
   def getContexts(self, requests):
     self.tracer.log('starting getContexts')
+    self.tracer.log(requests)
     self.cursor.execute('SELECT position,word,raw FROM word_index WHERE (' +
         'OR '.join(map(lambda request:
             '(position BETWEEN %s AND %s) ' % (
@@ -67,7 +68,6 @@ class DbDao:
         ') ' +
         'AND book_id ="%s" ' % self.bookId +
         'ORDER BY position')
-    self.tracer.log('done executing')
 
     tokenMap = {}
     for row in self.cursor.fetchall():

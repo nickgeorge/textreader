@@ -2,8 +2,8 @@
 
 import cgi, cgitb
 import json
-import document
-import flaf_db
+from utils import document
+from utils import flaf_db
 cgitb.enable()
 
 form = cgi.FieldStorage()

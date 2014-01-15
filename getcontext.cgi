@@ -3,9 +3,8 @@
 import sys
 import cgi, cgitb
 import json
-import flaf_db
-import document
-
+from utils import flaf_db
+from utils import document
 cgitb.enable()
 
 
