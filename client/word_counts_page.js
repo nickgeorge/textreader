@@ -1,4 +1,4 @@
-WordCountPage = function(data) {
+WordCountsPage = function(data) {
   this.contentElement = null;
   this.wordCounts = data.wordCounts;
   this.maxWordCount = this.wordCounts[0][1];
@@ -8,10 +8,10 @@ WordCountPage = function(data) {
   this.wordHovercard = new Hovercard();
 };
 
-WordCountPage.prototype.render = function(element) {
+WordCountsPage.prototype.render = function(element) {
   this.contentElement = element;
 
-  this.contentElement.innerHTML = wordcountpage.templates.main({
+  this.contentElement.innerHTML = wordcountspage.templates.main({
     wordCounts: this.wordCounts,
     book: this.books[this.bookId]
   });
@@ -36,19 +36,19 @@ WordCountPage.prototype.render = function(element) {
   $(window).scroll(Util.bind(this.maybeGetCounts, this));
 };
 
-WordCountPage.prototype.setBarSize = function(index, elm) {
+WordCountsPage.prototype.setBarSize = function(index, elm) {
   elm.style.width = Math.max(1,
       710 * (this.wordCounts[index][1] / this.maxWordCount)) + 'px';
 };
 
-WordCountPage.prototype.maybeGetCounts = function() {
+WordCountsPage.prototype.maybeGetCounts = function() {
   if ($(window).scrollTop() > $(document).height() - 6 * $(window).height() &&
       !this.requestInFlight) {
     this.getCounts(this.wordCounts.length, 200);
   }
 };
 
-WordCountPage.prototype.getCounts = function(startIndex, count) {
+WordCountsPage.prototype.getCounts = function(startIndex, count) {
   this.requestInFlight = true;
   $.ajax({
     url: '/getwordcount.cgi',
@@ -62,11 +62,11 @@ WordCountPage.prototype.getCounts = function(startIndex, count) {
   });
 };
 
-WordCountPage.prototype.onGetWordCountsSuccess =
+WordCountsPage.prototype.onGetWordCountsSuccess =
     function(startIndex, countsData) {
   this.requestInFlight = false;
   var newBatchContainer = document.createElement('div');
-  newBatchContainer.innerHTML = wordcountpage.templates.wordCountGroup({
+  newBatchContainer.innerHTML = wordcountspage.templates.wordCountGroup({
         wordCounts: countsData,
         startIndex: startIndex
   });

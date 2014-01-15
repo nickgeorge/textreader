@@ -20,8 +20,9 @@ data = {
 
 doc = document.Document();
 
-doc.requireJs('word_count_page.js')
-doc.requireSoy('word_count_page.soy')
+doc.setTitle('Word Counts')
+doc.requireJs('word_counts_page.js')
+doc.requireSoy('word_counts_page.soy')
 doc.requireJs('hovercard.js')
 doc.requireJs('searchbar.js')
 doc.requireJs('menu.js')
@@ -34,7 +35,7 @@ doc.addCss('style.css')
 
 doc.bodyLine('<div id="main-content"></div>')
 doc.bodyLine('<script>')
-doc.bodyLine('  var page = new WordCountPage(%s);' % json.dumps(data))
+doc.bodyLine('  var page = new WordCountsPage(%s);' % json.dumps(data))
 doc.bodyLine('  page.render($(\'#main-content\')[0]);')
 doc.bodyLine('  setTimeout(function(){$(\'body\').scrollTop(0);}, 0);')
 doc.bodyLine('</script>')
