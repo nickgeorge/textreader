@@ -13,7 +13,7 @@ Hovercard = function() {
     document.body.appendChild(hovercardsDiv);
   }
   $('#hovercards').append(this.contentElement);
-  $(this.contentElement).hover(Util.bind(this.onContentHover, this));
+  $(this.contentElement).hover(util.bind(this.onContentHover, this));
 
 
   Hovercard.instances.push(this);
@@ -22,11 +22,11 @@ Hovercard = function() {
 Hovercard.instances = [];
 
 Hovercard.prototype.showOnHover = function(selectorOrJquery) {
-  $(selectorOrJquery).hover(Util.bind(this.onHover, this));
+  $(selectorOrJquery).hover(util.bind(this.onHover, this));
 };
 
 Hovercard.prototype.showOnClick = function(selector) {
-  $(document.body).click(Util.bind(this.onClick, this));
+  $(document.body).click(util.bind(this.onClick, this));
 };
 
 Hovercard.prototype.setContent = function(component) {
@@ -48,7 +48,7 @@ Hovercard.prototype.onHover = function(event) {
     this.show();
   } else if (isSameElement){
       this.isHovered = false;
-      setTimeout(Util.bind(this.maybeHide, this), 75);
+      setTimeout(util.bind(this.maybeHide, this), 75);
   }
 };
 
@@ -57,7 +57,7 @@ Hovercard.prototype.onContentHover = function(event) {
     this.isInContent = true;
   } else {
     this.isInContent = false;
-    setTimeout(Util.bind(this.maybeHide, this), 75);
+    setTimeout(util.bind(this.maybeHide, this), 75);
   }
 };
 

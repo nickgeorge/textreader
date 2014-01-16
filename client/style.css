@@ -117,6 +117,7 @@ a {
   margin: 20px auto 40px auto;
   padding: 5px 5px 5px 5px;
   box-shadow: 1px 1px 1px #888888;
+  min-height: 52000px;
 }
 
 .word-count-bar {
@@ -125,9 +126,11 @@ a {
   margin: 0px 0 3px 0;
   box-shadow: 1px 1px 1px #888888;
   position: relative;
+
+  width: 0px;
 }
 
-.word-count-container:nth-child(2n) .word-count-bar {
+.word-count-container:nth-child(2n+1) .word-count-bar {
   background-color: skyblue;
 }
 
@@ -153,4 +156,8 @@ a {
 
 .word-count-container {
   position: relative;
+}
+
+.book-title {
+  color: firebrick;
 }

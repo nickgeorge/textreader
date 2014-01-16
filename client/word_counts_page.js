@@ -18,14 +18,15 @@ WordCountsPage.prototype.render = function(element) {
 
   Searchbar.init(this.books, this.bookId, '');
 
+
   $(this.contentElement).find('.word-count-bar').each(
-      Util.bind(this.setBarSize, this));
+       util.bind(this.setBarSize, this));
 
   this.wordHovercard.setContent(
       new Menu([
         {
           text: 'See in ' + this.books[this.bookId].title,
-          action: Util.bind(function(anchor){
+          action: util.bind(function(anchor){
             var word = $(anchor).find('.word-count-word')[0];
             window.location.href = '/textreader/?bookId=' + this.bookId +
                 '&word=' + this.wordHovercard.anchor.innerHTML;
@@ -33,7 +34,8 @@ WordCountsPage.prototype.render = function(element) {
         }
       ])).showOnHover($(this.contentElement).find('.word-count-word'));
 
-  $(window).scroll(Util.bind(this.maybeGetCounts, this));
+  $(window).scroll(util.bind(this.maybeGetCounts, this));
+  this.getCounts(this.wordCounts.length, 1600);
 };
 
 WordCountsPage.prototype.setBarSize = function(index, elm) {
@@ -44,7 +46,7 @@ WordCountsPage.prototype.setBarSize = function(index, elm) {
 WordCountsPage.prototype.maybeGetCounts = function() {
   if ($(window).scrollTop() > $(document).height() - 6 * $(window).height() &&
       !this.requestInFlight) {
-    this.getCounts(this.wordCounts.length, 200);
+    this.getCounts(this.wordCounts.length, 3200);
   }
 };
 
@@ -57,7 +59,7 @@ WordCountsPage.prototype.getCounts = function(startIndex, count) {
       count: count,
       bookId: this.bookId
     },
-    success: Util.bind(this.onGetWordCountsSuccess, this, startIndex),
+    success: util.bind(this.onGetWordCountsSuccess, this, startIndex),
     error: function(){console.log(arguments)}
   });
 };
@@ -73,13 +75,19 @@ WordCountsPage.prototype.onGetWordCountsSuccess =
   $(this.contentElement).find('.word-counts-container').
       append(newBatchContainer);
 
-  this.wordCounts = this.wordCounts.concat(countsData);
+  this.wordCounts = this.wordCounts.slice(0, startIndex).
+      concat(countsData);
 
   $newBars = $(this.contentElement).
       find('.word-count-batch-' + startIndex + ' .word-count-bar');
   this.wordHovercard.showOnHover($newBars);
-  Util.forEach($newBars,
+  util.forEach($newBars,
       function(barElm, index){
         this.setBarSize(startIndex + index, barElm);
       }, this);
+
+  // if (countsData.length > 0) {
+  //   setTimeout(util.bind(this.getCounts, this, this.wordCounts.length, 800),
+  //       2000);
+  // }
 };

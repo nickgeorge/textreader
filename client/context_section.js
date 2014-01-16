@@ -16,10 +16,10 @@ ListPage.prototype.render = function(contentDiv) {
   });
 
   $('.context-section-expander').click(
-      Util.bind(this.onExpanderClicked, this));
+      util.bind(this.onExpanderClicked, this));
 
   $('#search-bar-button').click(
-      Util.bind(this.onSearchButtonClicked, this));
+      util.bind(this.onSearchButtonClicked, this));
 
   var page = this;
   $('#search-bar-word-input').keypress(function(event) {
@@ -47,7 +47,7 @@ ListPage.prototype.onExpanderClicked = function(event) {
       word: this.word,
       bookId: this.bookId
     },
-    success: Util.bind(this.onGetContext, this, isUpExpand),
+    success: util.bind(this.onGetContext, this, isUpExpand),
     error: function(){console.log(arguments)}
   });
 };
@@ -84,7 +84,7 @@ ListPage.prototype.onGetContext = function(isUpExpand, data) {
   }
 
   $(containerId + ' .context-section-expander').click(
-      Util.bind(this.onExpanderClicked, this));
+      util.bind(this.onExpanderClicked, this));
 };
 
 

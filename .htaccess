@@ -1,6 +1,6 @@
 RewriteEngine on
 RewriteRule ^textreader/wordcounts$ word_counts_page.cgi [L]
-RewriteRule ^textreader(/.*)?$ list_page.cgi [L]
+RewriteRule ^textreader/?$ list_page.cgi [L]
 
 
 RewriteCond   %{REQUEST_URI}   !.*soy\.js

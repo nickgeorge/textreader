@@ -52,18 +52,27 @@
       data-before="{length($context.before)}"
       data-after="{length($context.after)}"></div>
   <div class="context-section-text">
-    ...
-    {foreach $token in $context.before}
-      {$token.raw}{sp}
-    {/foreach}
-    <span class="keyword">{$context.token.raw}</span> {sp}
-    {foreach $token in $context.after}
-      {$token.raw}{sp}
-    {/foreach}
-    ...
+    {call .contextText}
+      {param context: $context /}
+    {/call}
   </div>
   <div class="context-section-expander expander-bottom"
       data-position="{$context.token.position}"
       data-before="{length($context.before)}"
       data-after="{length($context.after)}"></div>
+{/template}
+
+/**
+ * @param context
+ */
+{template .contextText}
+  ...
+  {foreach $token in $context.before}
+    {$token.raw}{sp}
+  {/foreach}
+  <span class="keyword">{$context.token.raw}</span> {sp}
+  {foreach $token in $context.after}
+    {$token.raw}{sp}
+  {/foreach}
+  ...
 {/template}

@@ -1,5 +1,12 @@
 #!/usr/bin/python
 
+"""
+ token = {
+    position: number,
+    word: string,
+    raw: string
+  }
+"""
 def newToken(position, word, raw):
   return {
     'position': int(position),
@@ -10,6 +17,13 @@ def newToken(position, word, raw):
 def readToken(row):
   return newToken(row[0], row[1], row[2])
 
+"""
+ book = {
+    id: number,
+    title: string,
+    author: string
+  }
+"""
 def newBook(id, title, author):
   return {
     'id': int(id),

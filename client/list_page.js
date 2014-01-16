@@ -18,18 +18,21 @@ ListPage.prototype.render = function(contentElm) {
   Searchbar.init(this.books, this.bookId, this.word);
 
   $('.context-section-expander').click(
-      Util.bind(this.onExpanderClicked, this));
+      util.bind(this.onExpanderClicked, this));
 
   var page = this;
   new Hovercard().setContent(new Menu([
     {
       text: 'Show Word Index',
-      action: Util.bind(function(){
+      action: util.bind(function(){
         window.location.href =
             '/textreader/wordcounts?bookId=' + this.bookId;
       }, this),
     }
   ])).showOnHover($('.book-title'));
+
+
+  // TODO: Ajax request to load remaining contexts
 };
 
 ListPage.prototype.onExpanderClicked = function(event) {
@@ -43,30 +46,31 @@ ListPage.prototype.onExpanderClicked = function(event) {
   $.ajax({
     url: '/getcontext.cgi',
     data: {
-      position: position,
+      positions: position,
       beforeCount: beforeCount + (isUpExpand ? 100 : 0),
       afterCount: afterCount + (isUpExpand ? 0 : 100),
       word: this.word,
       bookId: this.bookId
     },
-    success: Util.bind(this.onGetContext, this, isUpExpand),
+    success: util.bind(this.onGetContext, this, isUpExpand),
     error: function(){console.log(arguments)}
   });
 };
 
-ListPage.prototype.onGetContext = function(isUpExpand, data) {
-  var containerId = '#context-section-' + data.token.position;
-
-  var initialHeight =
-      getComputedStyle($(containerId + ' .context-section-text')[0]).height;
-
-  $(containerId)[0].innerHTML = listpage.templates.context({context: data});
+ListPage.prototype.onGetContext = function(isUpExpand, contexts) {
+  var context = contexts[0];
+  var containerId = '#context-section-' + context.token.position;
   var textSection = $(containerId + ' .context-section-text')[0];
-  textSection.style.height = 'auto';
+
+  var initialHeight = getComputedStyle(textSection).height;
+
+  $(containerId)[0].innerHTML = listpage.templates.context({context: context});
+  textSection = $(containerId + ' .context-section-text')[0];
+
   var finalHeight = getComputedStyle(textSection).height;
 
   textSection.style.height = initialHeight;
-  textSection.offsetHeight;
+  textSection.offsetHeight; // Forces render
   textSection.style.transition = 'height .4s ease-in-out';
   textSection.style.height = finalHeight;
 
@@ -86,7 +90,7 @@ ListPage.prototype.onGetContext = function(isUpExpand, data) {
   }
 
   $(containerId + ' .context-section-expander').click(
-      Util.bind(this.onExpanderClicked, this));
+      util.bind(this.onExpanderClicked, this));
 };
 
 ListPage.prototype.shift = function(delta) {

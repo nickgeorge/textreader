@@ -6,23 +6,36 @@ from utils import flaf_db
 from utils import flaf_types
 from utils import flaf_tracer
 from utils import document
-cgitb.enable()
 
+cgitb.enable()
 tracer = flaf_tracer.Tracer('ListPageAction')
 
+"""
+  The main action for rendering the ListPage (textreader/).
+  Gets a list of all instances of a word in a book, and then gets a context for
+  the first 25.  The remaining books will be loaded via ajax from the
+  client side js.
+
+  Expects:
+    word The word to search for.
+    bookId The book to search in.
+"""
 form = cgi.FieldStorage()
 word = form.getvalue('word') or 'windmills'
 bookId = int(form.getvalue('bookId') or 2)
 
 conn = flaf_db.newConn()
+dbDao = flaf_db.DbDao(conn, bookId)
 cursor = conn.cursor()
 
 tracer.log('made conn')
 
+# Get position of all hits.  This should probably be moved into the dao.
 cursor.execute('SELECT position FROM word_index ' +
     'WHERE book_id=%s AND word="%s" ' % (bookId, word) +
     'ORDER BY position ASC')
 
+# Package the positions into context requests
 contextRequests = []
 for row in cursor.fetchall():
   contextRequests.append({
@@ -30,21 +43,26 @@ for row in cursor.fetchall():
     'numWordsBefore': 25,
     'numWordsAfter': 25
   })
-
-tracer.log(contextRequests)
-
 tracer.log('processed hits, reading contexts')
 
-dbDao = flaf_db.DbDao(conn, bookId)
+# Dao request for the contexts around the first 25 hits
+contexts = dbDao.getContexts(contextRequests[0:25])
 
+# Package it all up into a single data object to pass down to the client
 data = {
   'word': word,
   'bookId': bookId,
+  'totalHits': len(contextRequests),
   'books': dbDao.getAllBooks(),
-  'contexts': dbDao.getContexts(contextRequests)
+  'contexts': contexts
 }
 tracer.log('read contexts')
 
+# Write it out in HTML for the browser.
+# This is kept to the bare minimum:
+#   creates a single content div
+#   creates a single javascript page object with the data from the server
+#   ensures the page is scrolled to the top
 doc = document.Document()
 
 doc.setTitle('Text Reader')

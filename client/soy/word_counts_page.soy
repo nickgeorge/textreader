@@ -55,8 +55,9 @@
 {template .titleboard}
   {call common.templates.titleboard}
     {param contents}
-      Showing word counts for{sp}
-      <span class="hoverable book-title" data-title="{$book.title}">
+      Showing{sp}
+      <span class="hoverable word-counts-anchor">word counts</span>{sp}for{sp}
+      <span class="book-title" data-title="{$book.title}">
         {$book.title}
       </span>
       , by {$book.author}

@@ -1,12 +1,12 @@
 var pi = Math.PI;
 
-Util = function(){};
+util = function(){};
 
-Util.degToRad = function(degrees) {
+util.degToRad = function(degrees) {
   return degrees * Math.PI / 180;
 };
 
-Util.inherits = function(childCtor, parentCtor) {
+util.inherits = function(childCtor, parentCtor) {
   /** @constructor */
   function tempCtor() {};
   tempCtor.prototype = parentCtor.prototype;
@@ -17,7 +17,7 @@ Util.inherits = function(childCtor, parentCtor) {
   childCtor.prototype.super = parentCtor;
 };
 
-Util.partial = function(fn, var_args) {
+util.partial = function(fn, var_args) {
   var args = Array.prototype.slice.call(arguments, 1);
   return function() {
     // Prepend the bound arguments to the current arguments.
@@ -27,7 +27,7 @@ Util.partial = function(fn, var_args) {
   };
 };
 
-Util.bind = function(fn, thisObj, var_args) {
+util.bind = function(fn, thisObj, var_args) {
   var args = Array.prototype.slice.call(arguments, 2);
   return function() {
     // Prepend the bound arguments to the current arguments.
@@ -37,7 +37,7 @@ Util.bind = function(fn, thisObj, var_args) {
   };
 };
 
-Util.base = function(me, opt_methodName, var_args) {
+util.base = function(me, opt_methodName, var_args) {
   var caller = arguments.callee.caller;
   if (caller.superClass_) {
     // This is a constructor. Call the superclass constructor.
@@ -64,16 +64,16 @@ Util.base = function(me, opt_methodName, var_args) {
     return me.constructor.prototype[opt_methodName].apply(me, args);
   } else {
     throw Error(
-        'Util.base called from a method of one name ' +
+        'util.base called from a method of one name ' +
         'to a method of a different name');
   }
 };
 
-Util.sqr = function(x) {
+util.sqr = function(x) {
   return x*x;
 };
 
-Util.forEach = function(arr, f, opt_obj) {
+util.forEach = function(arr, f, opt_obj) {
   var l = arr.length;  // must be fixed during loop... see docs
   var arr2 = arr;
   for (var i = 0; i < l; i++) {
@@ -83,9 +83,38 @@ Util.forEach = function(arr, f, opt_obj) {
   }
 };
 
-Util.assertEquals = function(expected, test) {
+util.assertEquals = function(expected, test) {
   if (expected !== test) throw new Error('Assertion failed: ' +
       'Expected {' + expected + '} but got {' + test + '}.');
+};
+
+util.dom = {};
+util.dom.expandToFit = function(elm, text, isUpExpand) {
+  var initialHeight = getComputedStyle(elm).height;
+
+  elm.innerHTML = text;
+  var textSection = $(containerId + ' .context-section-text')[0];
+  var finalHeight = getComputedStyle(textSection).height;
+
+  textSection.style.height = initialHeight;
+  textSection.offsetHeight; // Forces render
+  textSection.style.transition = 'height .4s ease-in-out';
+  textSection.style.height = finalHeight;
+
+  textSection.addEventListener('transitionend', function transitionEnd(event) {
+    if (event.propertyName == 'height') {
+      textSection.style.transition = '';
+      textSection.style.height = 'auto';
+      textSection.removeEventListener('transitionend', transitionEnd, false);
+    }
+  }, false)
+
+  if (isUpExpand) {
+    var delta = parseInt(finalHeight) - parseInt(initialHeight);
+    $('html, body').animate({
+      scrollTop: $(window).scrollTop() + delta
+    }, 400);
+  }
 };
 
 Array.prototype.apply = function(fnString, arg1, arg2, arg3) {
@@ -127,3 +156,5 @@ Array.prototype.average = function() {
   }
   return sum / (length);
 };
+
+

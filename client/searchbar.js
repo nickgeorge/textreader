@@ -17,10 +17,10 @@ Searchbar.prototype.render = function(contentElm) {
     initialWord: this.initialWord
   });
 
-  $('#search-bar-button').click(Util.bind(this.onSearchButtonClicked, this));
+  $('#search-bar-button').click(util.bind(this.onSearchButtonClicked, this));
 
 
-  $('#search-bar-word-input').keypress(Util.bind(function(event) {
+  $('#search-bar-word-input').keypress(util.bind(function(event) {
     if (event.keyCode == 13) {
       this.onSearchButtonClicked();
     }
@@ -33,6 +33,6 @@ Searchbar.prototype.onSearchButtonClicked = function() {
   if (word) {
     window.location.href = '/textreader?bookId=' + bookId + '&word=' + word;
   } else {
-    window.location.href = '/textreader/wordcount?bookId=' + bookId;
+    window.location.href = '/textreader/wordcounts?bookId=' + bookId;
   }
 };
