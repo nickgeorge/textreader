@@ -57,6 +57,12 @@ ListPage.prototype.onExpanderClicked = function(event) {
   });
 };
 
+ListPage.prototype.shift = function(delta) {
+  var contextsContainer = $('#contexts-container');
+  contextsContainer.css('marginTop',
+      (parseInt(contextsContainer.css('marginTop')) + delta + 'px'));
+}
+
 ListPage.prototype.onGetContext = function(isUpExpand, contexts) {
   var context = contexts[0];
   var containerId = '#context-section-' + context.token.position;
@@ -64,6 +70,7 @@ ListPage.prototype.onGetContext = function(isUpExpand, contexts) {
 
   var initialHeight = getComputedStyle(textSection).height;
 
+  // This is a bunch of assorted hackery for making the smooth exanding cards
   $(containerId)[0].innerHTML = listpage.templates.context({context: context});
   textSection = $(containerId + ' .context-section-text')[0];
 
@@ -92,9 +99,3 @@ ListPage.prototype.onGetContext = function(isUpExpand, contexts) {
   $(containerId + ' .context-section-expander').click(
       util.bind(this.onExpanderClicked, this));
 };
-
-ListPage.prototype.shift = function(delta) {
-  var contextsContainer = $('#contexts-container');
-  contextsContainer.css('marginTop',
-      (parseInt(contextsContainer.css('marginTop')) + delta + 'px'));
-}
