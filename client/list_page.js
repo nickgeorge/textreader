@@ -4,6 +4,7 @@ ListPage = function(data) {
   this.contexts = data.contexts;
   this.books = data.books;
   this.contentElm = null;
+  this.hoverCard = null;
 };
 
 ListPage.prototype.render = function(contentElm) {
@@ -20,20 +21,42 @@ ListPage.prototype.render = function(contentElm) {
   $('.context-section-expander').click(
       util.bind(this.onExpanderClicked, this));
 
-  var page = this;
-  new Hovercard().setContent(new Menu([
+  this.hoverCard = new Hovercard().setContent(new Menu([
     {
       text: 'Show Word Index',
       action: util.bind(function(){
         window.location.href =
-            '/textreader/wordcounts?bookId=' + this.bookId;
+            '/wordcounts?bookId=' + this.bookId;
       }, this),
     }
-  ])).showOnHover($('.book-title'));
-
-
-  // TODO: Ajax request to load remaining contexts
+  ]));
+  this.hoverCard.showOnHover($('.book-title'));
+  this.loadChunk();
 };
+
+ListPage.prototype.loadChunk = function() {
+  $.ajax({
+    url: '/getcontext/index',
+    data: {
+      startIndex: this.contexts.length,
+      beforeCount: 25,
+      afterCount: 25,
+      word: this.word,
+      bookId: this.bookId
+    },
+    success: util.bind(this.onContextsLoaded, this),
+    error: function(){console.log(arguments)}
+  });
+};
+
+ListPage.prototype.onContextsLoaded = function(newContexts) {
+  $('#contexts-container')[0].innerHTML += listpage.templates.contextGroup({
+    contexts: newContexts
+  });
+  $('.context-section-expander').click(
+      util.bind(this.onExpanderClicked, this));
+};
+
 
 ListPage.prototype.onExpanderClicked = function(event) {
   var $target = $(event.target);
@@ -42,38 +65,55 @@ ListPage.prototype.onExpanderClicked = function(event) {
   var afterCount = parseInt($target.attr('data-after'));
   var isUpExpand = $target.hasClass('expander-top');
 
-
   $.ajax({
-    url: '/getcontext.cgi',
+    url: '/getcontext/position',
     data: {
       positions: position,
       beforeCount: beforeCount + (isUpExpand ? 100 : 0),
       afterCount: afterCount + (isUpExpand ? 0 : 100),
-      word: this.word,
       bookId: this.bookId
     },
-    success: util.bind(this.onGetContext, this, isUpExpand),
+    success: util.bind(this.onGetExpandedContext, this, isUpExpand),
     error: function(){console.log(arguments)}
   });
 };
 
 ListPage.prototype.shift = function(delta) {
-  var contextsContainer = $('#contexts-container');
+  var contextsContainer = $('#cards-container');
   contextsContainer.css('marginTop',
       (parseInt(contextsContainer.css('marginTop')) + delta + 'px'));
 }
 
-ListPage.prototype.onGetContext = function(isUpExpand, contexts) {
+/**
+ * Handles response from the server to a get contexts request,
+ * to expand context.
+ * n.b. that the server always sends an array of contexts, even when this is
+ * only a single context, as in the case of here.
+ * @param {boolean} isUpExpand Whether or not this is an "up" direction
+ *     expand.
+ * @param {Array.<Object>} contexts An array with a single context element.
+ */
+ListPage.prototype.onGetExpandedContext = function(isUpExpand, contexts) {
   var context = contexts[0];
   var containerId = '#context-section-' + context.token.position;
-  var textSection = $(containerId + ' .context-section-text')[0];
+  this.slideTextToFit(containerId,
+      listpage.templates.context({context: context}),
+      isUpExpand);
 
-  var initialHeight = getComputedStyle(textSection).height;
+  $(containerId + ' .context-section-expander').click(
+      util.bind(this.onExpanderClicked, this));
+};
 
+
+ListPage.prototype.slideTextToFit = function(sectionId, text, isUpExpand) {
   // This is a bunch of assorted hackery for making the smooth exanding cards
-  $(containerId)[0].innerHTML = listpage.templates.context({context: context});
-  textSection = $(containerId + ' .context-section-text')[0];
+  var initialHeight = getComputedStyle(
+      $(sectionId + ' .context-section-text')[0]).height;
 
+  $(sectionId)[0].innerHTML = text;
+  // Note that when we reset the html of the section in the line above,
+  // we reset the dom.
+  var textSection = $(sectionId + ' .context-section-text')[0];
   var finalHeight = getComputedStyle(textSection).height;
 
   textSection.style.height = initialHeight;
@@ -95,7 +135,4 @@ ListPage.prototype.onGetContext = function(isUpExpand, contexts) {
       scrollTop: $(window).scrollTop() + delta
     }, 400);
   }
-
-  $(containerId + ' .context-section-expander').click(
-      util.bind(this.onExpanderClicked, this));
 };

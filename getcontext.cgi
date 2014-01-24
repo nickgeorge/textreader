@@ -3,45 +3,59 @@
 import sys
 import cgi, cgitb
 import json
-from utils import flaf_db
-from utils import document
-from utils import flaf_tracer
+from common import flaf_db
+from common import document
+from common import flaf_tracer
 
 cgitb.enable()
-tracer = flaf_tracer.Tracer('getcontext cgi')
-
-"""
-  Ajax action for getting the context around one or more positions.
-
-  Expects:
-    positions Comma-delimited list of positions
-    beforeCount How many words before the position to read
-    afterCount How many words after the position to read
-
-  Returns:
-    Array of context objects, each of which contains the word position,
-    an array of words before and an array of words after
-"""
 form = cgi.FieldStorage()
-positions = map(int, form.getvalue('positions').split(','))
-numBefore = int(form.getvalue('beforeCount'))
-numAfter = int(form.getvalue('afterCount'))
-bookId = form.getvalue('bookId')
+action = form.getvalue('action') or 'position'
 
+if action == 'position':
+  '''
+    Ajax action for getting the context around one or more positions.
 
-# Turn each position into a "request" object that can be passed to the dao
-requests = map(lambda position: {
-    'position': positions[0],
-    'numWordsBefore': numBefore,
-    'numWordsAfter': numAfter
-  }, positions)
+    Expects:
+      positions Comma-delimited list of positions
+      beforeCount How many words before the position to read
+      afterCount How many words after the position to read
 
-dbDao = flaf_db.DbDao(flaf_db.newConn(), bookId)
-contexts = dbDao.getContexts(requests)
+    Returns:
+      Array of context objects (see flaf_types)
+  '''
+  tracer = flaf_tracer.Tracer('getcontext/position')
+  positions = map(int, form.getvalue('positions').split(','))
+  numBefore = int(form.getvalue('beforeCount'))
+  numAfter = int(form.getvalue('afterCount'))
+  bookId = form.getvalue('bookId')
+  dbDao = flaf_db.DbDao(flaf_db.newConn(), bookId)
 
-tracer.log('got data')
+  # Turn each position into a request object that can be passed to the dao
+  requests = map(lambda position: {
+      'position': position,
+      'numWordsBefore': numBefore,
+      'numWordsAfter': numAfter
+    }, positions)
 
-document.writeJsonHeader()
-sys.stdout.write(json.dumps(contexts))
+  document.writeJson(dbDao.getContexts(requests))
+  tracer.log('finished request')
 
-tracer.log("wrote doc")
+elif action == 'index':
+  tracer = flaf_tracer.Tracer('getcontext/index')
+  bookId = int(form.getvalue('bookId'))
+  dbDao = flaf_db.DbDao(flaf_db.newConn(), bookId)
+
+  request = {
+    'word': form.getvalue('word'),
+    'numWordsBefore': int(form.getvalue('beforeCount')),
+    'numWordsAfter': int(form.getvalue('afterCount'))
+  }
+
+  if form.getvalue('startIndex'):
+    request['startIndex'] = form.getvalue('startIndex')
+  if form.getvalue('count'):
+    request['count'] = form.getvalue('count')
+
+  document.writeJson(dbDao.getContextsByIndex(**request))
+
+  tracer.log('finished request')

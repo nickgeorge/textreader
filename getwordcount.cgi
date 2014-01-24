@@ -3,8 +3,8 @@
 import cgi, cgitb
 import json
 import sys
-from utils import document
-from utils import flaf_db
+from common import document
+from common import flaf_db
 
 cgitb.enable()
 
@@ -18,7 +18,7 @@ cgitb.enable()
     count How many words to select
 
   Returns:
-    Array of couts data.  This is an array of tuples of the form (word, counts)
+    Array of counts data.  This is an array of tuples of the form (word, counts)
 """
 form = cgi.FieldStorage()
 bookId = int(form.getvalue('bookId'))

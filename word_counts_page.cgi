@@ -2,8 +2,9 @@
 
 import cgi, cgitb
 import json
-from utils import document
-from utils import flaf_db
+from common import document
+from common import flaf_db
+from common import flaf_tracer
 
 cgitb.enable()
 
@@ -16,6 +17,7 @@ cgitb.enable()
   Expects:
     bookId The book to search in.
 """
+tracer = flaf_tracer.Tracer('word counts page')
 form = cgi.FieldStorage()
 bookId = int(form.getvalue('bookId') or 4)
 
@@ -38,15 +40,17 @@ doc = document.Document();
 doc.setTitle('Word Counts')
 doc.requireJs('word_counts_page.js')
 doc.requireSoy('word_counts_page.soy')
-doc.requireJs('hovercard.js')
-doc.requireJs('searchbar.js')
-doc.requireJs('menu.js')
+doc.requireJs('common/hovercard.js')
+doc.requireJs('common/searchbar.js')
+doc.requireJs('common/menu.js')
 doc.requireSoy('menu.soy')
 doc.requireSoy('common.soy')
-doc.requireJs('utils/soyutils.js')
-doc.requireJs('utils/util.js')
-doc.requireJs('utils/jquery/1.10.2/jquery.min.js')
+doc.requireJs('common/utils/soyutils.js')
+doc.requireJs('common/utils/util.js')
+doc.requireJs('common/utils/extensions.js')
+doc.requireJs('common/utils/jquery/1.10.2/jquery.min.js')
 doc.addCss('style.css')
+doc.addCss('common/common.css')
 
 doc.bodyLine('<div id="main-content"></div>')
 doc.bodyLine('<script>')

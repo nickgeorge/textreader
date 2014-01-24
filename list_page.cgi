@@ -2,10 +2,10 @@
 
 import cgi, cgitb
 import json
-from utils import flaf_db
-from utils import flaf_types
-from utils import flaf_tracer
-from utils import document
+from common import flaf_db
+from common import flaf_types
+from common import flaf_tracer
+from common import document
 
 cgitb.enable()
 tracer = flaf_tracer.Tracer('ListPageAction')
@@ -28,31 +28,15 @@ conn = flaf_db.newConn()
 dbDao = flaf_db.DbDao(conn, bookId)
 cursor = conn.cursor()
 
-tracer.log('made conn')
+tracer.log('Looking for [%s] in book %s' % (word, bookId))
 
-# Get position of all hits.  This should probably be moved into the dao.
-cursor.execute('SELECT position FROM word_index ' +
-    'WHERE book_id=%s AND word="%s" ' % (bookId, word) +
-    'ORDER BY position ASC')
+contexts = dbDao.getContextsByIndex(word, count=25)
 
-# Package the positions into context requests
-contextRequests = []
-for row in cursor.fetchall():
-  contextRequests.append({
-    'position': int(row[0]),
-    'numWordsBefore': 25,
-    'numWordsAfter': 25
-  })
-tracer.log('processed hits, reading contexts')
-
-# Dao request for the contexts around the first 25 hits
-contexts = dbDao.getContexts(contextRequests[0:25])
-
-# Package it all up into a single data object to pass down to the client
+# Package the contexts into a single data object
+# to pass down to the client
 data = {
   'word': word,
   'bookId': bookId,
-  'totalHits': len(contextRequests),
   'books': dbDao.getAllBooks(),
   'contexts': contexts
 }
@@ -68,15 +52,17 @@ doc = document.Document()
 doc.setTitle('Text Reader')
 doc.requireJs('list_page.js')
 doc.requireSoy('list_page.soy')
-doc.requireJs('hovercard.js')
-doc.requireJs('searchbar.js')
-doc.requireJs('menu.js')
+doc.requireJs('common/hovercard.js')
+doc.requireJs('common/searchbar.js')
+doc.requireJs('common/menu.js')
 doc.requireSoy('menu.soy')
 doc.requireSoy('common.soy')
-doc.requireJs('utils/soyutils.js')
-doc.requireJs('utils/util.js')
-doc.requireJs('utils/jquery/1.10.2/jquery.min.js')
+doc.requireJs('common/utils/soyutils.js')
+doc.requireJs('common/utils/util.js')
+doc.requireJs('common/utils/extensions.js')
+doc.requireJs('common/utils/jquery/1.10.2/jquery.min.js')
 doc.addCss('style.css')
+doc.addCss('common/common.css')
 
 doc.bodyLine('<div id="main-content"></div>')
 doc.bodyLine('<script>')

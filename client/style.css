@@ -1,49 +1,4 @@
 
-body {
-  background-color: #e5e5e5;
-  margin: 40px 0 0 0;
-}
-
-#search-bar-container {
-  position: fixed;
-  top: 0;
-  text-align: center;
-  width: 100%;
-  z-index: 100;
-}
-
-#search-bar {
-  background-color: lightgray;
-  border-left: 1px solid gray;
-  border-right: 1px solid gray;
-  border-bottom: 1px solid gray;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0px 5px 2px 5px;
-  box-shadow: 2px 2px 1px #888888;
-  width: 340px;
-}
-
-#search-bar-book-select {
-  max-width: 150px
-}
-
-#search-bar-word-input {
-  width: 100px;
-  margin-left: 5px;
-  margin-right: 5px;
-  padding-left: 4px;
-}
-
-.titleboard {
-  width: 600px;
-  padding: 5px 5px 5px 5px;
-  text-align: center;
-  background-color: white;
-  margin: 55px auto 20px auto;
-  box-shadow: 1px 1px 1px #888888;
-}
-
 .context-section {
   background-color: white;
   margin: 20px auto 20px auto;
@@ -79,37 +34,6 @@ body {
   color: blue;
 }
 
-.keyword {
-  color: blue;
-  font-weight: bold;
-}
-
-.hoverable {
-  color: firebrick;
-}
-
-.hovercard {
-  position: fixed;
-  background-color: white;
-  color: black;
-  box-shadow: 1px 1px 1px #888888;
-  font-size: 14px;
-}
-
-.menu-item {
-  background-color: #e5e5e5;
-  border: 2px solid gray;
-  padding: 1px 2px 1px 2px;
-}
-
-.menu-item:hover {
-  background-color: lightgoldenrodyellow;
-}
-
-a {
-  color: blue;
-}
-
 
 .word-counts-container {
   background-color: white;
@@ -118,6 +42,7 @@ a {
   padding: 5px 5px 5px 5px;
   box-shadow: 1px 1px 1px #888888;
   min-height: 52000px;
+  transition: opacity .4s ease-out;
 }
 
 .word-count-bar {
@@ -156,8 +81,6 @@ a {
 
 .word-count-container {
   position: relative;
-}
-
-.book-title {
-  color: firebrick;
+  top: 0px;
+  left: 0px;
 }

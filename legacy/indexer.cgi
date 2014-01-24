@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-import MySQLdb
 import cgi, cgitb
 import re
 

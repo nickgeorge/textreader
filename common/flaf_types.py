@@ -17,6 +17,7 @@ def newToken(position, word, raw):
 def readToken(row):
   return newToken(row[0], row[1], row[2])
 
+
 """
  book = {
     id: number,
@@ -33,3 +34,13 @@ def newBook(id, title, author):
 
 def readBook(row):
   return newBook(row[0], row[1], row[2])
+
+
+"""
+  context = {
+    token: token,
+    before: Array.<token>,
+    after: Array.<token>
+  }
+"""
+

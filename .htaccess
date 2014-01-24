@@ -1,7 +1,8 @@
 RewriteEngine on
-RewriteRule ^textreader/wordcounts$ word_counts_page.cgi [L]
-RewriteRule ^textreader/?$ list_page.cgi [L]
-
+RewriteBase /
+RewriteRule ^wordcounts$ word_counts_page.cgi [QSA,L]
+RewriteRule ^$ search [R]
+RewriteRule ^search$ list_page.cgi [L]
 
 RewriteCond   %{REQUEST_URI}   !.*soy\.js
 RewriteCond   %{REQUEST_URI}   !/client/*
@@ -9,4 +10,6 @@ RewriteRule ^(.*\.(js|css))$ /client/$1 [L]
 
 RewriteCond   %{REQUEST_URI}   !/client/soy/gen/*
 RewriteRule ^(.*\.soy\.js)$ /client/soy/gen/$1 [L]
+
+RewriteRule ^/?([^\.]*)/([^\.]*)$ $1.cgi?action=$2 [QSA,L]
 

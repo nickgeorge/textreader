@@ -18,6 +18,18 @@ WordCountsPage.prototype.render = function(element) {
 
   Searchbar.init(this.books, this.bookId, '');
 
+  $(this.contentElement).find('.word-count-bar:lt(50)').css('transition',
+      'width .6s cubic-bezier(.4,.1,.46,.1)')
+  this.contentElement.offsetHeight; // Forces render
+
+
+  $(this.contentElement).find('.word-count-bar')[0].addEventListener(
+      'transitionend',
+      util.bind(function transitionEnd(event) {
+        if (event.propertyName == 'width') {
+          this.getCounts(this.wordCounts.length, 1600);
+        }
+      }, this), false)
 
   $(this.contentElement).find('.word-count-bar').each(
        util.bind(this.setBarSize, this));
@@ -28,14 +40,13 @@ WordCountsPage.prototype.render = function(element) {
           text: 'See in ' + this.books[this.bookId].title,
           action: util.bind(function(anchor){
             var word = $(anchor).find('.word-count-word')[0];
-            window.location.href = '/textreader/?bookId=' + this.bookId +
+            window.location.href = '/search?bookId=' + this.bookId +
                 '&word=' + this.wordHovercard.anchor.innerHTML;
           }, this)
         }
       ])).showOnHover($(this.contentElement).find('.word-count-word'));
 
   $(window).scroll(util.bind(this.maybeGetCounts, this));
-  this.getCounts(this.wordCounts.length, 1600);
 };
 
 WordCountsPage.prototype.setBarSize = function(index, elm) {
@@ -85,9 +96,24 @@ WordCountsPage.prototype.onGetWordCountsSuccess =
       function(barElm, index){
         this.setBarSize(startIndex + index, barElm);
       }, this);
+};
 
-  // if (countsData.length > 0) {
-  //   setTimeout(util.bind(this.getCounts, this, this.wordCounts.length, 800),
-  //       2000);
-  // }
+
+WordCountsPage.prototype.collapse = function() {
+  var barSelector = '.word-count-container:lt(50)';
+
+  $(this.contentElement).find(barSelector).css('transition', '' +
+      'top 1s cubic-bezier(.4,.1,.46,.1), ' +
+      'left 1s cubic-bezier(.4,.1,.46,.1), ' +
+      '-webkit-transform 1s ease-in ');
+
+  this.contentElement.offsetHeight; // Forces render
+
+  $(barSelector).each(function(index, element) {
+    element.style.top = 2000 + Math.random() * 1000 + 'px';
+    element.style.left = Math.random() * 1000 - 500 + 'px';
+    element.style['-webkit-transform'] = 'rotate(' + (Math.random() * 50 - 25) + 'deg)';
+  });
+
+  $(this.contentElement).find('.word-count-container').css('opacity', 0);
 };

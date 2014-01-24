@@ -31,8 +31,8 @@ Searchbar.prototype.onSearchButtonClicked = function() {
   var bookId = $('#search-bar-book-select').find(":selected").val();
   var word = $('#search-bar-word-input').val();
   if (word) {
-    window.location.href = '/textreader?bookId=' + bookId + '&word=' + word;
+    window.location.href = '/search?bookId=' + bookId + '&word=' + word;
   } else {
-    window.location.href = '/textreader/wordcounts?bookId=' + bookId;
+    window.location.href = '/search/wordcounts?bookId=' + bookId;
   }
 };

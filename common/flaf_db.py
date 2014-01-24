@@ -9,9 +9,13 @@ cgitb.enable()
   thread, but I'm not sure how much it matters.
 """
 def newConn():
+
+  with file('password.txt', 'r') as f:
+      pw = f.read()
+
   return MySQLdb.connect(host="localhost",
     user="root",
-    passwd="fd360",
+    passwd= pw.strip(' \n'),
     db="flaf")
 
 """
@@ -62,7 +66,6 @@ class DbDao:
   def getContext(self, position, numWordsBefore, numWordsAfter):
     tokens = self.chunk(position - numWordsBefore, position + numWordsAfter)
     context = {
-      'position': position,
       'token': None,
       'before': [],
       'after': []
@@ -111,8 +114,7 @@ class DbDao:
     if not requests:
       return [];
 
-    self.tracer.log(len(requests))
-    self.tracer.log('starting getContexts')
+    self.tracer.log('making request for %s contexts' % len(requests))
     self.cursor.execute('SELECT position,word,raw FROM word_index WHERE (' +
         'OR '.join(map(lambda request:
             '(position BETWEEN %s AND %s) ' % (
@@ -122,19 +124,20 @@ class DbDao:
         ') ' +
         'AND book_id ="%s" ' % self.bookId +
         'ORDER BY position')
+    self.tracer.log('done making request')
 
     # build map from position to token
     tokenMap = {}
     for row in self.cursor.fetchall():
       token = flaf_types.readToken(row)
       tokenMap[token['position']] = token
+    self.tracer.log('done packing token map')
 
     # build an array of contexts from the map, with one context object
     # per request.
     contexts = []
     for request in requests:
       context = {
-        'position': request['position'],
         'token': tokenMap[request['position']],
         'before': [],
         'after': []
@@ -153,6 +156,29 @@ class DbDao:
       contexts.append(context)
 
     return contexts
+
+  def getContextsByIndex(self, word='', startIndex=0,
+      count=18446744073709551615,
+      numWordsBefore=25, numWordsAfter=25):
+    cmd = ('SELECT position FROM word_index ' +
+        'WHERE book_id=%s AND word="%s" ' % (self.bookId, word) +
+        'ORDER BY position ASC ');
+    # Get position of all hits.
+    cmd += 'LIMIT %s,%s' % (startIndex, count)
+    self.tracer.log(cmd)
+    self.cursor.execute(cmd)
+
+    positions = [];
+    for row in self.cursor.fetchall():
+      positions.append(row[0])
+
+    contextRequests = map(lambda position: {
+      'position': position,
+      'numWordsBefore': numWordsBefore,
+      'numWordsAfter': numWordsAfter
+    }, positions);
+
+    return self.getContexts(contextRequests)
 
   """
     Gets a chunk of word counts data, starting with the (startIndex)th most
