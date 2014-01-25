@@ -73,12 +73,8 @@ util.base = function(me, opt_methodName, var_args) {
   }
 };
 
-util.sqr = function(x) {
-  return x*x;
-};
-
 util.forEach = function(arr, f, opt_obj) {
-  var l = arr.length;  // must be fixed during loop... see docs
+  var l = arr.length;
   var arr2 = arr;
   for (var i = 0; i < l; i++) {
     if (i in arr2) {
@@ -87,9 +83,13 @@ util.forEach = function(arr, f, opt_obj) {
   }
 };
 
-util.assertEquals = function(expected, test) {
-  if (expected !== test) throw new Error('Assertion failed: ' +
-      'Expected {' + expected + '} but got {' + test + '}.');
+util.require = function(path) {
+  document.write('<script src="/' + path + '"></script>')
+};
+
+util.useCss = function(path) {
+  document.write(
+      '<link rel="stylesheet" type="text/css" href="/' + path + '">');
 };
 
 util.dom = {};

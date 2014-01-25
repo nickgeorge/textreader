@@ -1,3 +1,5 @@
+util.require('menu.soy');
+
 Menu = function(options) {
   this.contentElement = null;
   this.options = options;

@@ -8,6 +8,7 @@ from common import document
 from common import flaf_tracer
 
 cgitb.enable()
+dbDao = flaf_db.DbDao(flaf_db.newConn())
 form = cgi.FieldStorage()
 action = form.getvalue('action') or 'position'
 
@@ -28,7 +29,6 @@ if action == 'position':
   numBefore = int(form.getvalue('beforeCount'))
   numAfter = int(form.getvalue('afterCount'))
   bookId = form.getvalue('bookId')
-  dbDao = flaf_db.DbDao(flaf_db.newConn(), bookId)
 
   # Turn each position into a request object that can be passed to the dao
   requests = map(lambda position: {
@@ -37,15 +37,14 @@ if action == 'position':
       'numWordsAfter': numAfter
     }, positions)
 
-  document.writeJson(dbDao.getContexts(requests))
+  document.writeJson(dbDao.getContexts(bookId, requests))
   tracer.log('finished request')
 
 elif action == 'index':
   tracer = flaf_tracer.Tracer('getcontext/index')
-  bookId = int(form.getvalue('bookId'))
-  dbDao = flaf_db.DbDao(flaf_db.newConn(), bookId)
 
   request = {
+    'bookId': int(form.getvalue('bookId')),
     'word': form.getvalue('word'),
     'numWordsBefore': int(form.getvalue('beforeCount')),
     'numWordsAfter': int(form.getvalue('afterCount'))

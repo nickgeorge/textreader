@@ -1,3 +1,11 @@
+util.require('word_counts_page.soy');
+util.require('common/searchbar.js');
+util.require('common/hovercard.js');
+util.require('common/menu.js');
+util.require('common.soy');
+util.useCss('word_counts_page.css');
+
+
 WordCountsPage = function(data) {
   this.contentElement = null;
   this.wordCounts = data.wordCounts;
@@ -6,6 +14,7 @@ WordCountsPage = function(data) {
   this.bookId = data.bookId;
   this.requestInFlight = false;
   this.wordHovercard = new Hovercard();
+  this.graphTypeHovercard = new Hovercard();
 };
 
 WordCountsPage.prototype.render = function(element) {
@@ -44,7 +53,9 @@ WordCountsPage.prototype.render = function(element) {
                 '&word=' + this.wordHovercard.anchor.innerHTML;
           }, this)
         }
-      ])).showOnHover($(this.contentElement).find('.word-count-word'));
+      ]));
+  this.wordHovercard.showOnHover(
+      $(this.contentElement).find('.word-count-word'));
 
   $(window).scroll(util.bind(this.maybeGetCounts, this));
 };
@@ -114,6 +125,5 @@ WordCountsPage.prototype.collapse = function() {
     element.style.left = Math.random() * 1000 - 500 + 'px';
     element.style['-webkit-transform'] = 'rotate(' + (Math.random() * 50 - 25) + 'deg)';
   });
-
-  $(this.contentElement).find('.word-count-container').css('opacity', 0);
+  $(this.contentElement).find('.word-counts-container').css('background', 'rgba(1, 1, 1, 0)');
 };

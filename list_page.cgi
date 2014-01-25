@@ -13,7 +13,7 @@ tracer = flaf_tracer.Tracer('ListPageAction')
 """
   The main action for rendering the ListPage (textreader/).
   Gets a list of all instances of a word in a book, and then gets a context for
-  the first 25.  The remaining books will be loaded via ajax from the
+  the first 30.  The remaining books will be loaded via ajax from the
   client side js.
 
   Expects:
@@ -25,12 +25,12 @@ word = form.getvalue('word') or 'windmills'
 bookId = int(form.getvalue('bookId') or 2)
 
 conn = flaf_db.newConn()
-dbDao = flaf_db.DbDao(conn, bookId)
+dbDao = flaf_db.DbDao(conn)
 cursor = conn.cursor()
 
 tracer.log('Looking for [%s] in book %s' % (word, bookId))
 
-contexts = dbDao.getContextsByIndex(word, count=25)
+contexts = dbDao.getContextsByIndex(bookId, word, count=30)
 
 # Package the contexts into a single data object
 # to pass down to the client
@@ -48,21 +48,10 @@ tracer.log('read contexts')
 #   creates a single javascript page object with the data from the server
 #   ensures the page is scrolled to the top
 doc = document.Document()
+doc.addCommonDeps();
 
 doc.setTitle('Text Reader')
-doc.requireJs('list_page.js')
-doc.requireSoy('list_page.soy')
-doc.requireJs('common/hovercard.js')
-doc.requireJs('common/searchbar.js')
-doc.requireJs('common/menu.js')
-doc.requireSoy('menu.soy')
-doc.requireSoy('common.soy')
-doc.requireJs('common/utils/soyutils.js')
-doc.requireJs('common/utils/util.js')
-doc.requireJs('common/utils/extensions.js')
-doc.requireJs('common/utils/jquery/1.10.2/jquery.min.js')
-doc.addCss('style.css')
-doc.addCss('common/common.css')
+doc.require('list_page.js')
 
 doc.bodyLine('<div id="main-content"></div>')
 doc.bodyLine('<script>')

@@ -44,7 +44,7 @@
  */
 {template .contextGroup}
   {foreach $context in $contexts}
-    <div class="context-section" id="context-section-{$context.token.position}"
+    <div class="context-section card" id="context-section-{$context.token.position}"
     data-position="{$context.token.position}" >
       {call .context}
         {param context: $context /}

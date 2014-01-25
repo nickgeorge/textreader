@@ -1,0 +1,44 @@
+.word-counts-container {
+  min-height: 52000px;
+  transition: background 1s ease-out;
+}
+
+.word-count-bar {
+  display: inline-block;
+  background-color: #e8e8e8;
+  margin: 0px 0 3px 0;
+  box-shadow: 1px 1px 1px #888888;
+  position: relative;
+
+  width: 0px;
+}
+
+.word-count-container:nth-child(2n+1) .word-count-bar {
+  background-color: skyblue;
+}
+
+.word-count-word {
+  margin: 2px 0 1px 4px;
+  color: darkblue;
+  display: inline-block;
+}
+
+.word-count-count {
+  position: absolute;
+  right: 0px;
+  margin: 1px 0px 1px 0px;
+}
+
+.word-count-ruler {
+  position: absolute;
+  width: 715px;
+  height: 1px;
+  background-color: darkgray;
+  top: 10px
+}
+
+.word-count-container {
+  position: relative;
+  top: 0px;
+  left: 0px;
+}

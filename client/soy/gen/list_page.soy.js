@@ -17,11 +17,11 @@ listpage.templates.titleboard = function(opt_data, opt_ignored) {
 
 listpage.templates.contextGroup = function(opt_data, opt_ignored) {
   var output = '';
-  var contextList45 = opt_data.contexts;
-  var contextListLen45 = contextList45.length;
-  for (var contextIndex45 = 0; contextIndex45 < contextListLen45; contextIndex45++) {
-    var contextData45 = contextList45[contextIndex45];
-    output += '<div class="context-section" id="context-section-' + soy.$$escapeHtml(contextData45.token.position) + '" data-position="' + soy.$$escapeHtml(contextData45.token.position) + '" >' + listpage.templates.context({context: contextData45}) + '</div>';
+  var contextList29 = opt_data.contexts;
+  var contextListLen29 = contextList29.length;
+  for (var contextIndex29 = 0; contextIndex29 < contextListLen29; contextIndex29++) {
+    var contextData29 = contextList29[contextIndex29];
+    output += '<div class="context-section card" id="context-section-' + soy.$$escapeHtml(contextData29.token.position) + '" data-position="' + soy.$$escapeHtml(contextData29.token.position) + '" >' + listpage.templates.context({context: contextData29}) + '</div>';
   }
   return output;
 };
@@ -29,18 +29,18 @@ listpage.templates.contextGroup = function(opt_data, opt_ignored) {
 
 listpage.templates.context = function(opt_data, opt_ignored) {
   var output = '<div class="context-section-expander expander-top" data-position="' + soy.$$escapeHtml(opt_data.context.token.position) + '" data-before="' + soy.$$escapeHtml(opt_data.context.before.length) + '" data-after="' + soy.$$escapeHtml(opt_data.context.after.length) + '"></div><div class="context-section-text">...';
-  var tokenList63 = opt_data.context.before;
-  var tokenListLen63 = tokenList63.length;
-  for (var tokenIndex63 = 0; tokenIndex63 < tokenListLen63; tokenIndex63++) {
-    var tokenData63 = tokenList63[tokenIndex63];
-    output += soy.$$escapeHtml(tokenData63.raw) + ' ';
+  var tokenList47 = opt_data.context.before;
+  var tokenListLen47 = tokenList47.length;
+  for (var tokenIndex47 = 0; tokenIndex47 < tokenListLen47; tokenIndex47++) {
+    var tokenData47 = tokenList47[tokenIndex47];
+    output += soy.$$escapeHtml(tokenData47.raw) + ' ';
   }
   output += '<span class="keyword">' + soy.$$escapeHtml(opt_data.context.token.raw) + '</span>  ';
-  var tokenList70 = opt_data.context.after;
-  var tokenListLen70 = tokenList70.length;
-  for (var tokenIndex70 = 0; tokenIndex70 < tokenListLen70; tokenIndex70++) {
-    var tokenData70 = tokenList70[tokenIndex70];
-    output += soy.$$escapeHtml(tokenData70.raw) + ' ';
+  var tokenList54 = opt_data.context.after;
+  var tokenListLen54 = tokenList54.length;
+  for (var tokenIndex54 = 0; tokenIndex54 < tokenListLen54; tokenIndex54++) {
+    var tokenData54 = tokenList54[tokenIndex54];
+    output += soy.$$escapeHtml(tokenData54.raw) + ' ';
   }
   output += '...</div><div class="context-section-expander expander-bottom" data-position="' + soy.$$escapeHtml(opt_data.context.token.position) + '" data-before="' + soy.$$escapeHtml(opt_data.context.before.length) + '" data-after="' + soy.$$escapeHtml(opt_data.context.after.length) + '"></div>';
   return output;

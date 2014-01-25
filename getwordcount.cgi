@@ -26,8 +26,8 @@ startIndex = int(form.getvalue('startIndex'))
 count = int(form.getvalue('count'))
 
 conn = flaf_db.newConn()
-dbDao = flaf_db.DbDao(conn, bookId)
+dbDao = flaf_db.DbDao(conn)
 
 document.writeJsonHeader()
-wordCounts = dbDao.getWordCounts(startIndex, count)
+wordCounts = dbDao.getWordCounts(bookId, startIndex, count)
 sys.stdout.write(json.dumps(wordCounts))

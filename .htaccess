@@ -1,7 +1,7 @@
 RewriteEngine on
 RewriteBase /
 RewriteRule ^wordcounts$ word_counts_page.cgi [QSA,L]
-RewriteRule ^$ search [R]
+RewriteRule ^$ search?bookId=2&word=windmills [R]
 RewriteRule ^search$ list_page.cgi [L]
 
 RewriteCond   %{REQUEST_URI}   !.*soy\.js
@@ -9,7 +9,7 @@ RewriteCond   %{REQUEST_URI}   !/client/*
 RewriteRule ^(.*\.(js|css))$ /client/$1 [L]
 
 RewriteCond   %{REQUEST_URI}   !/client/soy/gen/*
-RewriteRule ^(.*\.soy\.js)$ /client/soy/gen/$1 [L]
+RewriteRule ^(.*\.soy)$ /client/soy/gen/$1.js [L]
 
 RewriteRule ^/?([^\.]*)/([^\.]*)$ $1.cgi?action=$2 [QSA,L]
 

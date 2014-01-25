@@ -1,3 +1,5 @@
+util.require('searchbar.soy');
+
 Searchbar = function(books, opt_initialBookId, opt_initialWord) {
   this.books = books;
   this.initialBookId = opt_initialBookId || 0;
@@ -11,7 +13,7 @@ Searchbar.init = function(books, bookId, word) {
 
 Searchbar.prototype.render = function(contentElm) {
   this.contentElm = contentElm;
-  this.contentElm.innerHTML = common.templates.searchbar({
+  this.contentElm.innerHTML = searchbar.templates.main({
     books: this.books,
     initialBookId: this.initialBookId,
     initialWord: this.initialWord
@@ -33,6 +35,6 @@ Searchbar.prototype.onSearchButtonClicked = function() {
   if (word) {
     window.location.href = '/search?bookId=' + bookId + '&word=' + word;
   } else {
-    window.location.href = '/search/wordcounts?bookId=' + bookId;
+    window.location.href = '/wordcounts?bookId=' + bookId;
   }
 };

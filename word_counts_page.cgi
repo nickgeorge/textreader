@@ -22,11 +22,11 @@ form = cgi.FieldStorage()
 bookId = int(form.getvalue('bookId') or 4)
 
 conn = flaf_db.newConn()
-dbDao = flaf_db.DbDao(conn, bookId);
+dbDao = flaf_db.DbDao(conn);
 
 # Get wordcounts data for words 0 through 400
 # This is an array of tuples of the form (word, counts)
-wordCounts = dbDao.getWordCounts(0, 400)
+wordCounts = dbDao.getWordCounts(bookId, 0, 400)
 
 # Package all data into a single data object to pass to the client-side code
 data = {
@@ -36,21 +36,10 @@ data = {
 }
 
 doc = document.Document();
+doc.addCommonDeps();
 
 doc.setTitle('Word Counts')
-doc.requireJs('word_counts_page.js')
-doc.requireSoy('word_counts_page.soy')
-doc.requireJs('common/hovercard.js')
-doc.requireJs('common/searchbar.js')
-doc.requireJs('common/menu.js')
-doc.requireSoy('menu.soy')
-doc.requireSoy('common.soy')
-doc.requireJs('common/utils/soyutils.js')
-doc.requireJs('common/utils/util.js')
-doc.requireJs('common/utils/extensions.js')
-doc.requireJs('common/utils/jquery/1.10.2/jquery.min.js')
-doc.addCss('style.css')
-doc.addCss('common/common.css')
+doc.require('word_counts_page.js')
 
 doc.bodyLine('<div id="main-content"></div>')
 doc.bodyLine('<script>')

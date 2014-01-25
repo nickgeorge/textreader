@@ -17,19 +17,23 @@ class Document:
     self.css = []
     self.bodyLines = []
     self.title = ''
-  def requireFile(self, filename):
+  def require(self, filename):
     if filename not in self.requiredFiles:
       self.requiredFiles.append(filename)
-  def requireJs(self, filename):
-    self.requireFile(filename)
-  def requireSoy(self, filename):
-    self.requireFile(filename + '.js')
   def addCss(self, filename):
     self.css.append(filename)
   def bodyLine(self, line):
     self.bodyLines.append(line)
   def setTitle(self, title):
     self.title = title;
+
+  def addCommonDeps(self):
+    self.require('common/utils/soyutils.js')
+    self.require('common/utils/util.js')
+    self.require('common/utils/extensions.js')
+    self.require('common/utils/jquery/1.10.2/jquery.min.js')
+    self.addCss('common/common.css')
+
 
   def write(self):
     writeHeader()

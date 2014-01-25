@@ -24,10 +24,9 @@ def newConn():
   this object.
 """
 class DbDao:
-  def __init__(self, conn, bookId):
+  def __init__(self, conn):
     self.conn = conn
     self.cursor = conn.cursor()
-    self.bookId  = bookId
     self.tracer = flaf_tracer.Tracer('DbDao')
 
   """
@@ -44,12 +43,12 @@ class DbDao:
     Takes a start and end position, and returns an array of tokens between them
     (see flaf_types)
   """
-  def chunk(self, start, end):
+  def chunk(self, bookId, start, end):
     self.tracer.log('Getting chunk %s : %s' % (start, end))
     self.cursor.execute('SELECT position,word,raw FROM word_index ' +
         'WHERE position BETWEEN %s AND %s ' % (start, end) +
         'AND raw IS NOT NULL ' +
-        'AND book_id ="%s" ' % self.bookId +
+        'AND book_id ="%s" ' % bookId +
         'ORDER BY position')
     tokens = []
     for row in self.cursor.fetchall():
@@ -63,8 +62,9 @@ class DbDao:
     Returns an array of tokens starting at position - numWordsBefore,
       and ending at position + numWordsAfter
   """
-  def getContext(self, position, numWordsBefore, numWordsAfter):
-    tokens = self.chunk(position - numWordsBefore, position + numWordsAfter)
+  def getContext(self, bookId, position, numWordsBefore, numWordsAfter):
+    tokens = self.chunk(bookId,
+        position - numWordsBefore, position + numWordsAfter)
     context = {
       'token': None,
       'before': [],
@@ -110,7 +110,7 @@ class DbDao:
 
     Returns an array of contexts
   """
-  def getContexts(self, requests):
+  def getContexts(self, bookId, requests):
     if not requests:
       return [];
 
@@ -122,7 +122,7 @@ class DbDao:
               request['position'] + request['numWordsAfter'] + 1
             ), requests)) +
         ') ' +
-        'AND book_id ="%s" ' % self.bookId +
+        'AND book_id ="%s" ' % bookId +
         'ORDER BY position')
     self.tracer.log('done making request')
 
@@ -157,11 +157,11 @@ class DbDao:
 
     return contexts
 
-  def getContextsByIndex(self, word='', startIndex=0,
+  def getContextsByIndex(self, bookId=0, word='', startIndex=0,
       count=18446744073709551615,
       numWordsBefore=25, numWordsAfter=25):
     cmd = ('SELECT position FROM word_index ' +
-        'WHERE book_id=%s AND word="%s" ' % (self.bookId, word) +
+        'WHERE book_id=%s AND word="%s" ' % (bookId, word) +
         'ORDER BY position ASC ');
     # Get position of all hits.
     cmd += 'LIMIT %s,%s' % (startIndex, count)
@@ -178,7 +178,7 @@ class DbDao:
       'numWordsAfter': numWordsAfter
     }, positions);
 
-    return self.getContexts(contextRequests)
+    return self.getContexts(bookId, contextRequests)
 
   """
     Gets a chunk of word counts data, starting with the (startIndex)th most
@@ -186,13 +186,13 @@ class DbDao:
 
     Returns array of wordcounts, which are tuples of (word, count)
   """
-  def getWordCounts(self, startIndex, count):
+  def getWordCounts(self, bookId, startIndex, count):
     self.cursor.execute('SELECT word_counts.word, count ' +
         'FROM word_counts LEFT JOIN word_description ' +
             'ON word_counts.word=word_description.word ' +
         'WHERE COALESCE(common, FALSE) IS FALSE ' +
             'AND COALESCE(pronoun, FALSE) IS FALSE ' +
-            'AND book_id = %s ' % self.bookId +
+            'AND book_id = %s ' % bookId +
         'ORDER BY count DESC, word ASC LIMIT %s, %s' % (startIndex + 1, count))
 
     wordCounts = [];
@@ -202,3 +202,42 @@ class DbDao:
       wordCounts.append((word, count))
     return wordCounts;
 
+  def getUncommonShared(self, bookIds):
+    # for now, assume 2 books
+    self.cursor.execute('' +
+        'SELECT ' +
+            'word, ' +
+            'COUNT(word) AS number_of_books, ' +
+            'BIT_OR(book_id=%s) AS in_first, ' % bookIds[0] +
+            'BIT_OR(book_id=%s) AS in_second ' % bookIds[1] +
+        'FROM word_counts ' +
+        'GROUP BY word ' +
+        'HAVING ' +
+            'in_first AND in_second AND number_of_books = 2 ' +
+        'ORDER BY number_of_books ASC, word ASC;')
+    words = [];
+    for row in self.cursor.fetchall():
+      words.append(row[0])
+    return words;
+
+  def getCommonUnshared(self, bookIds, threshold):
+    # for now, assume 2 books
+    self.cursor.execute('' +
+        'SELECT ' +
+            'word, ' +
+            'COUNT(word) AS number_of_books, ' +
+            'BIT_OR(book_id=%s) AS in_first, ' % bookIds[0] +
+            'BIT_OR(book_id=%s) AS in_second ' % bookIds[1] +
+        'FROM word_counts ' +
+        'GROUP BY word ' +
+        'HAVING ' +
+            '(in_first XOR in_second) AND number_of_books > 6 ' +
+        'ORDER BY number_of_books ASC, word ASC;')
+
+    words = {}
+    for bookId in bookIds:
+      words[str(bookId)] = []
+
+    for row in self.cursor.fetchall():
+      words[row[3] and str(bookIds[0]) or str(bookIds[1])].append(row[0])
+    return words;

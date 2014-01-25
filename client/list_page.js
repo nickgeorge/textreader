@@ -1,3 +1,11 @@
+util.require('list_page.soy');
+util.require('common/searchbar.js');
+util.require('common/hovercard.js');
+util.require('common/menu.js');
+util.require('common.soy');
+util.useCss('list_page.css');
+
+
 ListPage = function(data) {
   this.bookId = data.bookId;
   this.word = data.word;
