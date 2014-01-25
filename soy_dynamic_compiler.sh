@@ -1,13 +1,18 @@
 #!/bin/bash
 
-chsum1=""
+# Simple dynamic compiler for soy.
+# While running, any soy files in client/soy will be monitored for
+# changes, and will recompile all soy files to client/soy/gen
+# if any are changed.
+
+oldSum=""
 
 while [[ true ]]
 do
-    chsum2=`find client/soy/* -type f -exec md5sum {} \;`
-    if [[ $chsum1 != $chsum2 ]] ; then
+    newSum=`find client/soy/* -type f -exec md5sum {} \;`
+    if [[ $oldSum != $newSum ]] ; then
         echo "Recompiling soy..."
-        result=$(java -jar ~/Desktop/SoyToJsSrcCompiler.jar \
+        result=$(java -jar SoyToJsSrcCompiler.jar \
             --outputPathFormat client/soy/gen/{INPUT_FILE_NAME}.js \
             --allowExternalCalls false \
             client/soy/*.soy)
@@ -16,7 +21,7 @@ do
         fi
         echo "Done"
 
-        chsum1=$chsum2
+        oldSum=$newSum
     fi
     sleep 2
 done
