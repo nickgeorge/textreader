@@ -75,7 +75,7 @@ WordCountsPage.prototype.maybeGetCounts = function() {
 WordCountsPage.prototype.getCounts = function(startIndex, count) {
   this.requestInFlight = true;
   $.ajax({
-    url: '/getwordcount.cgi',
+    url: '/getwordcount',
     data: {
       startIndex: startIndex,
       count: count,
