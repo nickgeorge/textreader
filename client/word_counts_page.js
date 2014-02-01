@@ -7,7 +7,8 @@ util.useCss('word_counts_page.css');
 
 
 WordCountsPage = function(data) {
-  this.contentElement = null;
+  util.base();
+
   this.wordCounts = data.wordCounts;
   this.maxWordCount = this.wordCounts[0][1];
   this.books = data.books;
@@ -16,23 +17,23 @@ WordCountsPage = function(data) {
   this.wordHovercard = new Hovercard();
   this.graphTypeHovercard = new Hovercard();
 };
+util.inherits(WordCountsPage, Component);
 
-WordCountsPage.prototype.render = function(element) {
-  this.contentElement = element;
-
-  this.contentElement.innerHTML = wordcountspage.templates.main({
+WordCountsPage.prototype.createDom = function() {
+  util.renderSoy(this.getContentElement(), wordcountspage.templates.main, {
     wordCounts: this.wordCounts,
     book: this.books[this.bookId]
   });
 
   Searchbar.init(this.books, this.bookId, '');
 
-  $(this.contentElement).find('.word-count-bar:lt(50)').css('transition',
-      'width .6s cubic-bezier(.4,.1,.46,.1)')
+  this.findAll('.word-count-bar').slice(0, 50).forEach(function(element) {
+    element.style.transition = 'width .6s cubic-bezier(.4,.1,.46,.1)';
+  });
   this.contentElement.offsetHeight; // Forces render
 
 
-  $(this.contentElement).find('.word-count-bar')[0].addEventListener(
+  this.findAll('.word-count-bar')[0].addEventListener(
       'transitionend',
       util.bind(function transitionEnd(event) {
         if (event.propertyName == 'width') {
@@ -40,8 +41,7 @@ WordCountsPage.prototype.render = function(element) {
         }
       }, this), false)
 
-  $(this.contentElement).find('.word-count-bar').each(
-       util.bind(this.setBarSize, this));
+  this.findAll('.word-count-bar').forEach(this.setBarSize, this);
 
   this.wordHovercard.setContent(
       new Menu([
@@ -60,7 +60,7 @@ WordCountsPage.prototype.render = function(element) {
   $(window).scroll(util.bind(this.maybeGetCounts, this));
 };
 
-WordCountsPage.prototype.setBarSize = function(index, elm) {
+WordCountsPage.prototype.setBarSize = function(elm, index) {
   elm.style.width = Math.max(1,
       710 * (this.wordCounts[index][1] / this.maxWordCount)) + 'px';
 };
@@ -90,7 +90,7 @@ WordCountsPage.prototype.onGetWordCountsSuccess =
     function(startIndex, countsData) {
   this.requestInFlight = false;
   var newBatchContainer = document.createElement('div');
-  newBatchContainer.innerHTML = wordcountspage.templates.wordCountGroup({
+  util.renderSoy(newBatchContainer, wordcountspage.templates.wordCountGroup, {
         wordCounts: countsData,
         startIndex: startIndex
   });
@@ -105,7 +105,7 @@ WordCountsPage.prototype.onGetWordCountsSuccess =
   this.wordHovercard.showOnHover($newBars);
   util.forEach($newBars,
       function(barElm, index){
-        this.setBarSize(startIndex + index, barElm);
+        this.setBarSize(barElm, startIndex + index);
       }, this);
 };
 

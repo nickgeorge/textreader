@@ -12,11 +12,11 @@ wordcountspage.templates.main = function(opt_data, opt_ignored) {
 
 wordcountspage.templates.wordCountGroup = function(opt_data, opt_ignored) {
   var output = '';
-  var wordCountList103 = opt_data.wordCounts;
-  var wordCountListLen103 = wordCountList103.length;
-  for (var wordCountIndex103 = 0; wordCountIndex103 < wordCountListLen103; wordCountIndex103++) {
-    var wordCountData103 = wordCountList103[wordCountIndex103];
-    output += wordcountspage.templates.wordCount({word: wordCountData103[0], count: wordCountData103[1], startIndex: opt_data.startIndex});
+  var wordCountList93 = opt_data.wordCounts;
+  var wordCountListLen93 = wordCountList93.length;
+  for (var wordCountIndex93 = 0; wordCountIndex93 < wordCountListLen93; wordCountIndex93++) {
+    var wordCountData93 = wordCountList93[wordCountIndex93];
+    output += wordcountspage.templates.wordCount({word: wordCountData93[0], count: wordCountData93[1], startIndex: opt_data.startIndex});
   }
   return output;
 };

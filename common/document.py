@@ -28,10 +28,10 @@ class Document:
     self.title = title;
 
   def addCommonDeps(self):
-    self.require('common/utils/soyutils.js')
     self.require('common/utils/util.js')
-    self.require('common/utils/extensions.js')
+    self.require('common/utils/soyutils.js')
     self.require('common/utils/jquery/1.10.2/jquery.min.js')
+    self.require('common/component.js')
     self.addCss('common/common.css')
 
 

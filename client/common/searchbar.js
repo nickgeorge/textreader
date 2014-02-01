@@ -4,29 +4,37 @@ Searchbar = function(books, opt_initialBookId, opt_initialWord) {
   this.books = books;
   this.initialBookId = opt_initialBookId || 0;
   this.initialWord = opt_initialWord || '';
-  this.contentElm = null;
 };
+util.inherits(Searchbar, Component);
 
 Searchbar.init = function(books, bookId, word) {
   new Searchbar(books, bookId, word).render($('#search-bar-container')[0]);
 }
 
-Searchbar.prototype.render = function(contentElm) {
-  this.contentElm = contentElm;
-  this.contentElm.innerHTML = searchbar.templates.main({
-    books: this.books,
-    initialBookId: this.initialBookId,
+Searchbar.prototype.createDom = function() {
+  util.renderSoy(this.getContentElement(), searchbar.templates.main, {
+    initialBook: this.books[this.initialBookId].title,
     initialWord: this.initialWord
   });
 
-  $('#search-bar-button').click(util.bind(this.onSearchButtonClicked, this));
+  $(this.find('#search-bar-button')).click(
+      util.bind(this.onSearchButtonClicked, this));
 
-
-  $('#search-bar-word-input').keypress(util.bind(function(event) {
+  $(this.find('#search-bar-word-input')).keypress(util.bind(function(event) {
     if (event.keyCode == 13) {
       this.onSearchButtonClicked();
     }
   }, this));
+
+  $(this.find('#search-bar-book-input')).keypress(util.bind(function(event) {
+    if (event.keyCode == 13) {
+      this.onSearchButtonClicked();
+      return;
+    }
+
+  }, this));
+
+
 };
 
 Searchbar.prototype.onSearchButtonClicked = function() {

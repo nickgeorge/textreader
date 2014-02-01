@@ -25,24 +25,6 @@ class Indexer:
     self.conn.commit()
     return int(self.cursor.lastrowid)
 
-  def addToBooksByGutId(self, title, author, gutId):
-    tracer = flaf_tracer.Tracer("add by gut");
-    urllib2.ProxyHandler({})
-    text = urllib2.urlopen(
-        'http://www.gutenberg.org/cache/epub/%s/pg%s.txt' % (gutId, gutId))
-    # tracer.log('http://www.gutenberg.org/cache/epub/%s/pg%s.txt' % (gutId, gutId));
-    tracer.log('done');
-    tracer.log('ba');
-    tracer.log(text);
-    # self.cursor.execute('INSERT INTO books (title, author, text) ' +
-    #     'VALUES ("%s", "%s", LOAD_FILE("%s"))' % (
-    #         self.conn.escape_string(title),
-    #         self.conn.escape_string(author),
-    #         self.conn.escape_string(path)
-    #     ))
-    # self.conn.commit()
-    # return int(self.cursor.lastrowid)
-
   def addToWordIndex(self, bookId):
     self.cursor.execute('SELECT text FROM books WHERE book_id=' + str(bookId))
 

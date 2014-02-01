@@ -1,6 +1,4 @@
-var pi = Math.PI;
-
-util = function(){};
+util = {};
 
 util.degToRad = function(degrees) {
   return degrees * Math.PI / 180;
@@ -92,6 +90,34 @@ util.useCss = function(path) {
       '<link rel="stylesheet" type="text/css" href="/' + path + '">');
 };
 
+util.renderSoy = function(element, template, params) {
+  element.innerHTML = template(params);
+};
+
+
+/*********************/
+/*    util.style     */
+/*********************/
+util.style = {};
+
+util.style.getRgbValues = function(rgbString) {
+  var parts = rgbString.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+  return {
+    red: parseInt(parts[1]),
+    green: parseInt(parts[2]),
+    blue: parseInt(parts[3])
+  };
+};
+
+util.style.toRgbString = function(color) {
+  return 'rgb(' + color.red + ', ' + color.green + ', ' + color.blue + ')';
+};
+
+
+
+/********************/
+/*     util.dom     */
+/********************/
 util.dom = {};
 util.dom.expandToFit = function(elm, text, isUpExpand) {
   var initialHeight = getComputedStyle(elm).height;
@@ -121,3 +147,109 @@ util.dom.expandToFit = function(elm, text, isUpExpand) {
   }
 };
 
+
+/********************/
+/*      util.fn     */
+/********************/
+util.fn = {};
+
+util.fn.addClass = function(cssClass) {
+  return function(element) {
+    element.classList.add(cssClass);
+  }
+};
+
+util.fn.removeClass = function(cssClass) {
+  return function(element) {
+    element.classList.remove(cssClass);
+  }
+};
+
+util.fn.pluck = function(attr) {
+  return function(obj) {
+    return obj[attr];
+  }
+};
+
+
+/**********************/
+/*     util.array     */
+/**********************/
+util.array = {};
+
+util.array.pushAll = function(arr, addee) {
+  for (var i = 0, length = addee.length; i < addee.length; i++) {
+    arr.push(addee[i]);
+  }
+};
+
+util.array.apply = function(arr, fnString, arg1, arg2, arg3) {
+  for (var i = 0, elm; elm = arr[i]; i++) {
+    elm[fnString](arg1, arg2, arg3);
+  }
+};
+
+util.array.remove = function(arr, removee){
+  var index;
+  while((index = arr.indexOf(removee)) != -1){
+      arr.splice(index, 1);
+  }
+  return arr;
+};
+
+util.array.flatten = function(arr) {
+  var flattenedThis = [];
+  for (var i = 0; arr[i]; i++) {
+    if (arr[i].flatten) {
+      arr.pushAll(arr[i].flatten());
+    } else {
+      flattenedThis.push(arr[i]);
+    }
+  }
+};
+
+util.array.average = function(arr) {
+  var sum = 0;
+  var length = arr.length;
+  for (var i = 0; i < length; i++) {
+    sum += arr[i];
+  }
+  return sum / (length);
+};
+
+util.array.pluck = function(arr, key) {
+  var pluckedArray = [];
+  arr.forEach(function(value) {
+    pluckedArray.push(value[key]);
+  });
+  return pluckedArray;
+};
+
+util.array.forEach = function(arr, f, opt_ctx) {
+  var l = arr.length;
+  var arr2 = arr;
+  for (var i = 0; i < l; i++) {
+    if (i in arr2) {
+      f.call(opt_ctx, arr2[i], i, arr);
+    }
+  }
+};
+
+
+/**********************/
+/*    util.object     */
+/**********************/
+util.object = {};
+util.object.forEach = function(obj, f, opt_ctx) {
+  for (var key in this) {
+    f.call(opt_ctx, this[key], key, this);
+  }
+};
+
+util.object.toArray = function(obj, f, opt_ctx) {
+  var arr = [];
+  obj.forEach(function(elm,  key, origObj) {
+    arr.push(f.call(opt_ctx, elm, key, origObj));
+  }, opt_ctx);
+  return arr;
+};

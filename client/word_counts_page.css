@@ -5,7 +5,7 @@
 
 .word-count-bar {
   display: inline-block;
-  background-color: #e8e8e8;
+  background-color: #E8E8E8;
   margin: 0px 0 3px 0;
   box-shadow: 1px 1px 1px #888888;
   position: relative;
@@ -14,12 +14,12 @@
 }
 
 .word-count-container:nth-child(2n+1) .word-count-bar {
-  background-color: skyblue;
+  background-color: #87CEEB;
 }
 
 .word-count-word {
   margin: 2px 0 1px 4px;
-  color: darkblue;
+  color: #00008B;
   display: inline-block;
 }
 
@@ -33,7 +33,7 @@
   position: absolute;
   width: 715px;
   height: 1px;
-  background-color: darkgray;
+  background-color: #A9A9A9;
   top: 10px
 }
 

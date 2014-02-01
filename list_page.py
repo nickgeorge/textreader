@@ -30,15 +30,13 @@ cursor = conn.cursor()
 
 tracer.log('Looking for [%s] in book %s' % (word, bookId))
 
-contexts = dbDao.getContextsByIndex(bookId, word, count=30)
-
 # Package the contexts into a single data object
 # to pass down to the client
 data = {
   'word': word,
   'bookId': bookId,
-  'books': dbDao.getAllBooks(),
-  'contexts': contexts
+  'contexts': dbDao.getContextsByIndex(bookId, word, count=30),
+  'books': dbDao.getAllBooks()
 }
 tracer.log('read contexts')
 

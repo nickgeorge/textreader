@@ -11,13 +11,15 @@ ListPage = function(data) {
   this.word = data.word;
   this.contexts = data.contexts;
   this.books = data.books;
-  this.contentElm = null;
+  this.contentElement = null;
   this.hoverCard = null;
 };
 
-ListPage.prototype.render = function(contentElm) {
-  this.contentElm = contentElm;
-  this.contentElm.innerHTML = listpage.templates.main({
+
+ListPage.prototype.render = function(contentElement) {
+  this.contentElement = contentElement;
+
+  util.renderSoy(this.contentElement, listpage.templates.main, {
     contexts: this.contexts,
     bookId: this.bookId,
     word: this.word,
@@ -42,6 +44,7 @@ ListPage.prototype.render = function(contentElm) {
   this.loadChunk();
 };
 
+
 ListPage.prototype.loadChunk = function() {
   $.ajax({
     url: '/getcontext/index',
@@ -56,6 +59,7 @@ ListPage.prototype.loadChunk = function() {
     error: function(){console.log(arguments)}
   });
 };
+
 
 ListPage.prototype.onContextsLoaded = function(newContexts) {
   $('#contexts-container')[0].innerHTML += listpage.templates.contextGroup({

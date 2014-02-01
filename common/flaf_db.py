@@ -203,21 +203,30 @@ class DbDao:
     return wordCounts;
 
   def getUncommonShared(self, bookIds):
-    # for now, assume 2 books
-    self.cursor.execute('' +
+    cmd = ('' +
         'SELECT ' +
             'word, ' +
             'COUNT(word) AS number_of_books, ' +
-            'BIT_OR(book_id=%s) AS in_first, ' % bookIds[0] +
-            'BIT_OR(book_id=%s) AS in_second ' % bookIds[1] +
+            ', '.join(map(lambda bookId:
+                'BIT_OR(book_id=%s) AS in_%s' % (bookId, bookId), bookIds)) +
+            ' ' +
         'FROM word_counts ' +
         'GROUP BY word ' +
         'HAVING ' +
-            'in_first AND in_second AND number_of_books = 2 ' +
+            '(' +
+                ' + '.join(map(lambda bookId: 'in_%s ' % bookId, bookIds)) +
+            ') <= 2 ' +
         'ORDER BY number_of_books ASC, word ASC;')
-    words = [];
+    self.tracer.log(cmd)
+    self.cursor.execute(cmd)
+    words = {};
     for row in self.cursor.fetchall():
-      words.append(row[0])
+      key = 0;
+      for index in range(len(bookIds)):
+        key += pow(2, index) * row[index + 2]
+      if str(key) not in words:
+        words[str(key)] = []
+      words[str(key)].append((row[0], row[1]))
     return words;
 
   def getCommonUnshared(self, bookIds, threshold):

@@ -1,3 +1,7 @@
+.context-section {
+  border-radius: 4px;
+}
+
 .context-section-expander {
   width: 20px;
   background-color: #e5e5e5;

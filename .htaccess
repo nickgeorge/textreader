@@ -1,6 +1,7 @@
 RewriteEngine on
 RewriteBase /
 RewriteRule ^wordcounts$ word_counts_page.py [QSA,L]
+RewriteRule ^wordmap$ word_map_page.py [QSA,L]
 RewriteRule ^$ search?bookId=2&word=windmills [R]
 RewriteRule ^search$ list_page.py [L]
 
