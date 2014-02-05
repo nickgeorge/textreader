@@ -1,5 +1,7 @@
 import sys
 import json
+import flaf_tracer
+
 
 def writeHeader():
   print("Content-type:text/html\r\n\r\n")
@@ -17,6 +19,7 @@ class Document:
     self.css = []
     self.bodyLines = []
     self.title = ''
+    self.tracer = flaf_tracer.Tracer('Document')
   def require(self, filename):
     if filename not in self.requiredFiles:
       self.requiredFiles.append(filename)
@@ -36,6 +39,7 @@ class Document:
 
 
   def write(self):
+    self.tracer.log('starting write')
     writeHeader()
     print('<!DOCTYPE html>')
     print('<html>')
@@ -47,8 +51,11 @@ class Document:
     for filename in self.requiredFiles:
       print('    <script src="/' + filename + '"></script>')
     print('  </head>')
+    self.tracer.log('starting body')
     print('  <body>')
     for line in self.bodyLines:
       print('    ' + line)
     print('  </body>')
+    self.tracer.log('done body')
     print('</html>')
+    self.tracer.log('done write')

@@ -1,0 +1,34 @@
+#search-bar-container {
+  position: fixed;
+  top: 0;
+  text-align: center;
+  width: 100%;
+  z-index: 100;
+}
+
+#search-bar {
+  background-color: #D3D3D3;
+  border-left: 1px solid #808080;
+  border-right: 1px solid #808080;
+  border-bottom: 1px solid #808080;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0px 5px 2px 5px;
+  box-shadow: 2px 2px 1px #888888;
+  width: 500px;
+  border-radius: 25px;
+}
+
+#search-bar-book-input {
+  width: 150px;
+  margin-left: 5px;
+  margin-right: 5px;
+  padding-left: 4px;
+}
+
+#search-bar-word-input {
+  width: 100px;
+  margin-left: 5px;
+  margin-right: 5px;
+  padding-left: 4px;
+}

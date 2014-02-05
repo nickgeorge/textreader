@@ -1,6 +1,6 @@
 body {
   background-color: #e5e5e5;
-  margin: 40px 0 0 0;
+  margin: 0 0 0 0;
   overflow-x: hidden;
 }
 
@@ -32,11 +32,13 @@ body {
   color: black;
   box-shadow: 1px 1px 1px #888888;
   font-size: 14px;
+  z-index: 200;
+  border: 1px solid #808080;
 }
 
 .menu-item {
   background-color: white;
-  border: 2px solid #808080;
+  border: 1px solid #808080;
   padding: 1px 2px 1px 2px;
 }
 
@@ -44,43 +46,20 @@ body {
   background-color: #FAFAD2;
 }
 
+.menu-item-highlight {
+  background-color: #F0F0b2 !important;
+}
+
+.highlight-char {
+  color: magenta;
+  font-weight: bold;
+}
+
 .titleboard {
   width: 600px;
   padding: 5px 5px 5px 5px;
   text-align: center;
   background-color: white;
-  margin: 55px auto 20px auto;
+  margin: 0px auto 0px auto;
   box-shadow: 1px 1px 1px #888888;
-}
-
-#search-bar-container {
-  position: fixed;
-  top: 0;
-  text-align: center;
-  width: 100%;
-  z-index: 100;
-}
-
-#search-bar {
-  background-color: #D3D3D3;
-  border-left: 1px solid #808080;
-  border-right: 1px solid #808080;
-  border-bottom: 1px solid #808080;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0px 5px 2px 5px;
-  box-shadow: 2px 2px 1px #888888;
-  width: 340px;
-  border-radius: 25px;
-}
-
-#search-bar-book-select {
-  max-width: 150px
-}
-
-#search-bar-word-input {
-  width: 100px;
-  margin-left: 5px;
-  margin-right: 5px;
-  padding-left: 4px;
 }

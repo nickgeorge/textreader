@@ -13,6 +13,7 @@ ListPage = function(data) {
   this.books = data.books;
   this.contentElement = null;
   this.hoverCard = null;
+  this.searchbar = null;
 };
 
 
@@ -26,7 +27,7 @@ ListPage.prototype.render = function(contentElement) {
     books: this.books
   });
 
-  Searchbar.init(this.books, this.bookId, this.word);
+  this.searchbar = Searchbar.init(this.books, this.bookId, this.word);
 
   $('.context-section-expander').click(
       util.bind(this.onExpanderClicked, this));
@@ -37,7 +38,7 @@ ListPage.prototype.render = function(contentElement) {
       action: util.bind(function(){
         window.location.href =
             '/wordcounts?bookId=' + this.bookId;
-      }, this),
+      }, this)
     }
   ]));
   this.hoverCard.showOnHover($('.book-title'));

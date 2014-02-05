@@ -94,7 +94,6 @@ util.renderSoy = function(element, template, params) {
   element.innerHTML = template(params);
 };
 
-
 /*********************/
 /*    util.style     */
 /*********************/
@@ -147,6 +146,23 @@ util.dom.expandToFit = function(elm, text, isUpExpand) {
   }
 };
 
+util.dom.getAncestorByClass = function(element, cssClass) {
+  while (!element.classList.contains(cssClass) && element.parentElement) {
+    element = element.parentElement;
+  }
+  if (!element.classList.contains(cssClass)) {
+    return null;
+  }
+  return element;
+};
+
+util.dom.isChild = function(element, parent) {
+  while (element != parent && element.parentElement) {
+    element = element.parentElement;
+  }
+  return element == parent;
+};
+
 
 /********************/
 /*      util.fn     */
@@ -168,6 +184,36 @@ util.fn.removeClass = function(cssClass) {
 util.fn.pluck = function(attr) {
   return function(obj) {
     return obj[attr];
+  }
+};
+
+util.fn.equals = function(ref) {
+  return function(test) {
+    return test === ref;
+  }
+};
+
+util.fn.outputEquals = function(f, ref) {
+  return function(test) {
+    return f(test) === ref;
+  }
+};
+
+util.fn.pluckEquals = function(attr, ref) {
+  return function(obj) {
+    return obj[attr] === ref;
+  }
+};
+
+util.fn.not  = function(f) {
+  return function() {
+    return !f.apply(this, arguments);
+  };
+};
+
+util.fn.greaterThan = function(ref) {
+  return function(test) {
+    return test > ref;
   }
 };
 
@@ -241,15 +287,23 @@ util.array.forEach = function(arr, f, opt_ctx) {
 /**********************/
 util.object = {};
 util.object.forEach = function(obj, f, opt_ctx) {
-  for (var key in this) {
-    f.call(opt_ctx, this[key], key, this);
+  for (var key in obj) {
+    f.call(opt_ctx, obj[key], key, obj);
   }
 };
 
 util.object.toArray = function(obj, f, opt_ctx) {
   var arr = [];
-  obj.forEach(function(elm,  key, origObj) {
+  util.object.forEach(obj, function(elm,  key, origObj) {
     arr.push(f.call(opt_ctx, elm, key, origObj));
   }, opt_ctx);
   return arr;
+};
+
+util.object.shallowClone = function(obj) {
+  var res = {};
+  for (var key in obj) {
+    res[key] = obj[key];
+  }
+  return res;
 };

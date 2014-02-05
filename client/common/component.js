@@ -14,7 +14,6 @@ Component.prototype.getContentElement = function() {
 };
 
 Component.prototype.find = function(selector) {
-  // var targets = this.getContentElement().querySelector(selector);
   var targets = $(this.getContentElement()).find(selector);
   if (targets.length > 1) {
     throw new Error('Multiple elements found matching [' + selector + ']');
@@ -26,6 +25,10 @@ Component.prototype.find = function(selector) {
 };
 
 Component.prototype.findAll = function(selector) {
-  return Array.prototype.slice.call($(this.getContentElement()).find(selector),
-      0);
+  return Array.prototype.slice.call(
+      $(this.getContentElement()).find(selector), 0);
+};
+
+Component.prototype.listen = function(element, type, handler, opt_ctx) {
+  element.addEventListener(type, util.bind(handler, opt_ctx || this));
 };

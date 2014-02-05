@@ -6,8 +6,15 @@
 {template .main}
   <div>
     {foreach $option in $options}
-      <div class="menu-item" data-index="{index($option)}">
-        {$options[0].text}
+      <div class="menu-item menu-item-{index($option)}"
+          data-index="{index($option)}">
+        {foreach $char in $option.text}
+          {if $option.indices and $option.indices[index($char)]}
+            <span class="highlight-char">{$char}</span>
+          {else}
+            {$char}
+          {/if}
+        {/foreach}
       </div>
     {/foreach}
   </div>
