@@ -71,16 +71,6 @@ util.base = function(me, opt_methodName, var_args) {
   }
 };
 
-util.forEach = function(arr, f, opt_obj) {
-  var l = arr.length;
-  var arr2 = arr;
-  for (var i = 0; i < l; i++) {
-    if (i in arr2) {
-      f.call(opt_obj, arr2[i], i, arr);
-    }
-  }
-};
-
 util.require = function(path) {
   document.write('<script src="/' + path + '"></script>')
 };
@@ -92,6 +82,18 @@ util.useCss = function(path) {
 
 util.renderSoy = function(element, template, params) {
   element.innerHTML = template(params);
+};
+
+util.assert = function(bool, message) {
+  if (!bool) {
+    throw new Error(message);
+  }
+};
+
+util.assertEquals = function(a, b, message) {
+  if (a != b) {
+    throw new Error(message);
+  }
 };
 
 /*********************/
@@ -146,11 +148,11 @@ util.dom.expandToFit = function(elm, text, isUpExpand) {
   }
 };
 
-util.dom.getAncestorByClass = function(element, cssClass) {
-  while (!element.classList.contains(cssClass) && element.parentElement) {
+util.dom.getClosest = function(element, selector) {
+  while (!util.dom.matches(element, selector) && element.parentElement) {
     element = element.parentElement;
   }
-  if (!element.classList.contains(cssClass)) {
+  if (!util.dom.matches(element, selector)) {
     return null;
   }
   return element;
@@ -161,6 +163,38 @@ util.dom.isChild = function(element, parent) {
     element = element.parentElement;
   }
   return element == parent;
+};
+
+util.dom.findAll = function(selector, opt_parent) {
+  var parent = opt_parent || document;
+  return Array.prototype.slice.apply(
+      parent.querySelectorAll(selector));
+};
+
+util.dom.hasClass = function(element, cssClass) {
+  return element.classList.contains(cssClass);
+};
+
+util.dom.addClass = function(element, cssClass) {
+  element.classList.add(cssClass);
+};
+
+util.dom.removeClass = function(element, cssClass) {
+  element.classList.remove(cssClass);
+};
+
+// n.b. This will only work for nodes that have parents.
+util.dom.matches = function(element, selector) {
+  return util.dom.findAll(selector, element.parent).
+      indexOf(element) != -1;
+};
+
+util.dom.getData = function(element, key) {
+  return element.dataset[key];
+};
+
+util.dom.getIntData = function(element, key) {
+  return parseInt(element.dataset[key]);
 };
 
 
@@ -279,6 +313,12 @@ util.array.forEach = function(arr, f, opt_ctx) {
       f.call(opt_ctx, arr2[i], i, arr);
     }
   }
+};
+
+util.array.getOnlyElement = function(arr) {
+  util.assertEquals(1, arr.length,
+      'Array must have only one element.  Length: ' + arr.length);
+  return arr[0];
 };
 
 

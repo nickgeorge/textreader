@@ -1,0 +1,39 @@
+{namespace wordmap.templates}
+
+
+/**
+ * @param booksData
+ * @param bookIds
+ */
+{template .main}
+  <div class="word-map-container">
+    <div class="word-map-card">
+      {foreach $bookId in $bookIds}
+        {call .node}
+          {param text: $booksData[$bookId].title /}
+          {param nodeName: 'book' /}
+          {param nodeSuffix: $bookId /}
+        {/call}
+      {/foreach}
+    </div>
+    <div class="word-list-card">
+      <div class="word-list-container"></div>
+      <div style="display: none;" class="word-list-placeholder">  Loading...
+      </div>
+    </div>
+  </div>
+{/template}
+
+/**
+ * @param nodeName
+ * @param nodeSuffix
+ * @param text
+ */
+{template .node}
+  <div class="node node-{$nodeName} node-{$nodeName}-{$nodeSuffix}"
+      data-suffix="{$nodeSuffix}">
+    <div class="node-text">
+      {$text}
+    </div>
+  </div>
+{/template}

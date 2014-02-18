@@ -30,7 +30,6 @@ Hovercard.prototype.setOffset = function(offset) {
 };
 
 Hovercard.prototype.showOnHover = function(selectorOrJquery) {
-  this.anchor = $(selectorOrJquery)[0];
   $(selectorOrJquery).hover(util.bind(this.onHover, this));
 };
 

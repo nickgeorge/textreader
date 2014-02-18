@@ -22,20 +22,23 @@ tracer = flaf_tracer.Tracer('ListPageAction')
 """
 form = cgi.FieldStorage()
 word = form.getvalue('word') or 'windmills'
-bookId = int(form.getvalue('bookId') or 2)
+bookIdsString = form.getvalue('bookIds')
+bookIds = map(int, bookIdsString.split(',')) if bookIdsString else [2]
 
 conn = flaf_db.newConn()
 dbDao = flaf_db.DbDao(conn)
 cursor = conn.cursor()
 
-tracer.log('Looking for [%s] in book %s' % (word, bookId))
+word = word.strip(' .\'')
+
+tracer.log('Looking for [%s] in book %s' % (word, str(bookIds)))
 
 # Package the contexts into a single data object
 # to pass down to the client
 data = {
   'word': word,
-  'bookId': bookId,
-  'contexts': dbDao.getContextsByIndex(bookId, word, count=30),
+  'bookIds': bookIds,
+  'contexts': dbDao.getContextsByIndex(bookIds, word, count=30),
   'books': dbDao.getAllBooks()
 }
 tracer.log('read contexts')

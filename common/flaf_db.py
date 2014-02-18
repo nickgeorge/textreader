@@ -13,10 +13,10 @@ def newConn():
   with file('password.txt', 'r') as f:
       pw = f.read()
 
-  return MySQLdb.connect(host="localhost",
-    user="root",
+  return MySQLdb.connect(host='localhost',
+    user='nick',
     passwd= pw.strip(' \n'),
-    db="flaf")
+    db='flaf')
 
 """
   Data-access object (dao) for accessing mysql database.
@@ -45,7 +45,7 @@ class DbDao:
   """
   def chunk(self, bookId, start, end):
     self.tracer.log('Getting chunk %s : %s' % (start, end))
-    self.cursor.execute('SELECT position,word,raw FROM word_index ' +
+    self.cursor.execute('SELECT book_id, position, word, raw FROM word_index ' +
         'WHERE position BETWEEN %s AND %s ' % (start, end) +
         'AND raw IS NOT NULL ' +
         'AND book_id ="%s" ' % bookId +
@@ -66,6 +66,7 @@ class DbDao:
     tokens = self.chunk(bookId,
         position - numWordsBefore, position + numWordsAfter)
     context = {
+      'bookId': bookId,
       'token': None,
       'before': [],
       'after': []
@@ -100,7 +101,8 @@ class DbDao:
     SELECT position,word,raw FROM word_index WHERE
       (position BETWEEN 30 AND 60) OR
       (position BETWEEN 95 and 130)
-      AND bookId=47
+      AND
+        book_id=47 OR book_id=74
       ORDER BY position
 
     It stores the result of this query to a map from position to token.
@@ -110,19 +112,21 @@ class DbDao:
 
     Returns an array of contexts
   """
-  def getContexts(self, bookId, requests):
+  def getContexts(self, requests):
     if not requests:
       return [];
 
     self.tracer.log('making request for %s contexts' % len(requests))
-    self.cursor.execute('SELECT position,word,raw FROM word_index WHERE (' +
-        'OR '.join(map(lambda request:
-            '(position BETWEEN %s AND %s) ' % (
-              request['position'] - request['numWordsBefore'],
-              request['position'] + request['numWordsAfter'] + 1
-            ), requests)) +
-        ') ' +
-        'AND book_id ="%s" ' % bookId +
+    self.cursor.execute('SELECT position, word, raw, book_id FROM word_index ' +
+        ' WHERE ' +
+            '(' +
+              'OR '.join(map(lambda request:
+                  '(position BETWEEN %s AND %s AND book_id=%s) ' % (
+                    request['position'] - request['numWordsBefore'],
+                    request['position'] + request['numWordsAfter'] + 1,
+                    request['bookId']
+                  ), requests)) +
+            ') ' +
         'ORDER BY position')
     self.tracer.log('done making request')
 
@@ -130,15 +134,20 @@ class DbDao:
     tokenMap = {}
     for row in self.cursor.fetchall():
       token = flaf_types.readToken(row)
-      tokenMap[token['position']] = token
+      bookId = row[3]
+      if bookId not in tokenMap:
+        tokenMap[bookId] = {};
+      tokenMap[bookId][token['position']] = token
     self.tracer.log('done packing token map')
 
     # build an array of contexts from the map, with one context object
     # per request.
     contexts = []
     for request in requests:
+      tokenMapForBook = tokenMap[request['bookId']];
       context = {
-        'token': tokenMap[request['position']],
+        'bookId': request['bookId'],
+        'token': tokenMapForBook[request['position']],
         'before': [],
         'after': []
       }
@@ -146,39 +155,41 @@ class DbDao:
       for i in range(1, request['numWordsBefore'] + 1):
         tokenPosition = request['position'] - i;
         if (tokenPosition > 0):
-          context['before'].append(tokenMap[tokenPosition])
+          context['before'].append(tokenMapForBook[tokenPosition])
       context['before'].reverse()
       for i in range(1, request['numWordsAfter'] + 1):
         tokenPosition = request['position'] + i;
-        if (tokenPosition in tokenMap):
-          context['after'].append(tokenMap[tokenPosition])
+        if (tokenPosition in tokenMapForBook):
+          context['after'].append(tokenMapForBook[tokenPosition])
 
       contexts.append(context)
 
     return contexts
 
-  def getContextsByIndex(self, bookId=0, word='', startIndex=0,
+  def getContextsByIndex(self, bookIds=[], word='', startIndex=0,
       count=18446744073709551615,
       numWordsBefore=25, numWordsAfter=25):
-    cmd = ('SELECT position FROM word_index ' +
-        'WHERE book_id=%s AND word="%s" ' % (bookId, word) +
+    cmd = ('SELECT book_id, position FROM word_index ' +
+        'WHERE ' +
+            '(%s) ' % ' OR '.join(map(lambda bookId: 'book_id=%s' % bookId, bookIds)) +
+        'AND ' +
+            'word="%s" ' % word +
         'ORDER BY position ASC ');
-    # Get position of all hits.
+    # Get location of all hits.
     cmd += 'LIMIT %s,%s' % (startIndex, count)
     self.tracer.log(cmd)
     self.cursor.execute(cmd)
 
-    positions = [];
+    contextRequests = [];
     for row in self.cursor.fetchall():
-      positions.append(row[0])
+      contextRequests.append({
+        'bookId': row[0],
+        'position': row[1],
+        'numWordsBefore': numWordsBefore,
+        'numWordsAfter': numWordsAfter
+      });
 
-    contextRequests = map(lambda position: {
-      'position': position,
-      'numWordsBefore': numWordsBefore,
-      'numWordsAfter': numWordsAfter
-    }, positions);
-
-    return self.getContexts(bookId, contextRequests)
+    return self.getContexts(contextRequests)
 
   """
     Gets a chunk of word counts data, starting with the (startIndex)th most

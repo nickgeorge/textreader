@@ -16,6 +16,7 @@ WordCountsPage = function(data) {
   this.requestInFlight = false;
   this.wordHovercard = new Hovercard();
   this.graphTypeHovercard = new Hovercard();
+  this.searchbar = null;
 };
 util.inherits(WordCountsPage, Component);
 
@@ -25,7 +26,8 @@ WordCountsPage.prototype.createDom = function() {
     book: this.books[this.bookId]
   });
 
-  Searchbar.init(this.books, this.bookId, '');
+  this.searchbar = new Searchbar(this.books);
+  this.searchbar.render(this.find('#search-bar-container'));
 
   this.findAll('.word-count-bar').slice(0, 50).forEach(function(element) {
     element.style.transition = 'width .6s cubic-bezier(.4,.1,.46,.1)';
@@ -48,8 +50,8 @@ WordCountsPage.prototype.createDom = function() {
         {
           text: 'See in ' + this.books[this.bookId].title,
           action: util.bind(function(anchor){
-            var word = $(anchor).find('.word-count-word')[0];
-            window.location.href = '/search?bookId=' + this.bookId +
+            console.log(this.wordHovercard.anchor);
+            window.location.href = '/search?bookIds=' + this.bookId +
                 '&word=' + this.wordHovercard.anchor.innerHTML;
           }, this)
         }
@@ -103,7 +105,7 @@ WordCountsPage.prototype.onGetWordCountsSuccess =
   $newBars = $(this.contentElement).
       find('.word-count-batch-' + startIndex + ' .word-count-bar');
   this.wordHovercard.showOnHover($newBars);
-  util.forEach($newBars,
+  util.array.forEach($newBars,
       function(barElm, index){
         this.setBarSize(barElm, startIndex + index);
       }, this);

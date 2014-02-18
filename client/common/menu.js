@@ -24,7 +24,7 @@ Menu.prototype.setOptions = function(options) {
 Menu.prototype.createDom = function() {
   this.buildMenuOptions();
   this.listen(this.getContentElement(), 'click', function(event) {
-    this.options[$(event.target).attr('data-index')].action(event.target);
+    this.options[util.dom.getData(event.target, 'index')].action(event.target);
   });
 };
 

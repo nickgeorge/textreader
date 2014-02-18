@@ -4,19 +4,24 @@
  * Main template for ListPage.js.
  * @param contexts List page data.
  * @param books All books.
- * @param bookId The id of the book being searched.
+ * @param bookIds The ids of the books being searched.
  * @param word The word being searched for.
  */
 {template .main}
   <div id="search-bar-container"></div>
   <div id="cards-container">
-    {call .titleboard}
-      {param book: $books[$bookId] /}
-      {param word: $word /}
-    {/call}
+    {if length($bookIds) > 0}
+      {call .titleboard}
+        {param bookIds: $bookIds /}
+        {param books: $books /}
+        {param word: $word /}
+      {/call}
+    {/if}
     <div id="contexts-container">
       {call .contextGroup}
+        {param startIndex: 0 /}
         {param contexts: $contexts /}
+        {param books: $books /}
       {/call}
     </div>
   </div>
@@ -24,46 +29,66 @@
 {/template}
 
 /**
- * @param book Current book.
+ * @param bookIds Current book id.
+ * @param books All books.
  * @param word Current word
  */
 {template .titleboard}
   {call common.templates.titleboard}
     {param contents}
       Showing [<span class="keyword">{$word}</span>] in{sp}
-      <span class="hoverable book-title" data-title="{$book.title}">
-        {$book.title}
-      </span>
-      , by {$book.author}
+      {foreach $bookId in $bookIds}
+        {let $book: $books[$bookId] /}
+        <span class="hoverable book-title"
+            data-title="{$book.title}"
+            data-book-id="{$bookId}">
+          {$book.title}
+        </span>
+        , by {$book.author}
+        {if not isLast($bookId)}
+          , and<div class='clear'></div>
+        {/if}
+      {/foreach}
     {/param}
   {/call}
 {/template}
 
 /**
  * @param contexts
+ * @param startIndex
+ * @param books
  */
 {template .contextGroup}
-  {foreach $context in $contexts}
-    <div class="context-section card" id="context-section-{$context.token.position}"
-    data-position="{$context.token.position}" >
-      {call .context}
-        {param context: $context /}
-      {/call}
-    </div>
-  {/foreach}
+  <div class="context-group">
+    {foreach $context in $contexts}
+      {let $index: $startIndex + index($context) /}
+      <div class="context-section card"
+          id="context-section-{$index}"
+          data-context-index="{$index}" >
+        {call .context}
+          {param context: $context /}
+          {param book: $books[$context.bookId] /}
+        {/call}
+      </div>
+    {/foreach}
+  </div>
 {/template}
 
 /**
  * Template for context section
  * @param context The context data for this section.
+ * @param book
  */
 {template .context}
-  <div class="context-section-expander expander-top"
-      data-position="{$context.token.position}"
-      data-before="{length($context.before)}"
-      data-after="{length($context.after)}"></div>
+  {let $position: $context.token.position /}
+  <div class="context-section-expander expander-top"></div>
+  <div class="context-section-title">
+    {$book.title} - {$position}
+  </div>
   <div class="context-section-text">
-    ...
+    {if $position - length($context.before) > 1}
+      ...
+    {/if}
     {foreach $token in $context.before}
       {$token.raw}{sp}
     {/foreach}
@@ -73,9 +98,6 @@
     {/foreach}
     ...
   </div>
-  <div class="context-section-expander expander-bottom"
-      data-position="{$context.token.position}"
-      data-before="{length($context.before)}"
-      data-after="{length($context.after)}"></div>
+  <div class="context-section-expander expander-bottom"></div>
 {/template}
 

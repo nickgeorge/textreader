@@ -4,10 +4,10 @@ util.require('common/utils/keycodes.js');
 util.require('searchbar.soy');
 util.useCss('common/searchbar.css');
 
-Searchbar = function(books, opt_initialBookId, opt_initialWord) {
+Searchbar = function(books) {
   this.books = books;
-  this.bookId = opt_initialBookId || 0;
-  this.initialWord = opt_initialWord || '';
+  this.bookId = 0;
+  this.initialWord = '';
   this.menu = new Menu([]);
   this.hovercard = new Hovercard();
   this.scorer = new FuzzyScorer(util.object.toArray(books, function(book) {
@@ -21,17 +21,8 @@ Searchbar = function(books, opt_initialBookId, opt_initialWord) {
 };
 util.inherits(Searchbar, Component);
 
-Searchbar.init = function(books, bookId, word) {
-  var searchbar = new Searchbar(books, bookId, word);
-  searchbar.render($('#search-bar-container')[0]);
-  return searchbar;
-};
-
 Searchbar.prototype.createDom = function() {
-  util.renderSoy(this.getContentElement(), searchbar.templates.main, {
-    initialBook: this.books[this.bookId].title,
-    initialWord: this.initialWord
-  });
+  util.renderSoy(this.getContentElement(), searchbar.templates.main);
 
   this.bookInput = this.find('#search-bar-book-input');
   this.wordInput = this.find('#search-bar-word-input');
@@ -94,7 +85,7 @@ Searchbar.prototype.buildMenu = function(opt_show) {
 Searchbar.prototype.onSearchButtonClicked = function() {
   var word = this.wordInput.value;
   if (word) {
-    window.location.href = '/search?bookId=' + this.bookId + '&word=' + word;
+    window.location.href = '/search?bookIds=' + this.bookId + '&word=' + word;
   } else {
     window.location.href = '/wordcounts?bookId=' + this.bookId;
   }
@@ -104,4 +95,8 @@ Searchbar.prototype.selectBook = function(book) {
   this.bookInput.value = book.title;
   this.bookId = book.id;
   this.hovercard.hide();
+};
+
+Searchbar.prototype.setWord = function(word) {
+  this.wordInput.value = word;
 };

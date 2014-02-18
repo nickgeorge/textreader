@@ -28,23 +28,23 @@ if action == 'position':
   positions = map(int, form.getvalue('positions').split(','))
   numBefore = int(form.getvalue('beforeCount'))
   numAfter = int(form.getvalue('afterCount'))
-  bookId = form.getvalue('bookId')
+  bookId = int(form.getvalue('bookId'))
 
   # Turn each position into a request object that can be passed to the dao
   requests = map(lambda position: {
+      'bookId': bookId,
       'position': position,
       'numWordsBefore': numBefore,
       'numWordsAfter': numAfter
     }, positions)
 
-  document.writeJson(dbDao.getContexts(bookId, requests))
+  document.writeJson(dbDao.getContexts(requests))
   tracer.log('finished request')
 
 elif action == 'index':
   tracer = flaf_tracer.Tracer('getcontext/index')
-
   request = {
-    'bookId': int(form.getvalue('bookId')),
+    'bookIds': map(int, form.getvalue('bookIds').split(',')),
     'word': form.getvalue('word'),
     'numWordsBefore': int(form.getvalue('beforeCount')),
     'numWordsAfter': int(form.getvalue('afterCount'))

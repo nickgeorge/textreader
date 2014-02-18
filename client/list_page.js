@@ -7,7 +7,10 @@ util.useCss('list_page.css');
 
 
 ListPage = function(data) {
-  this.bookId = data.bookId;
+  util.base();
+
+  this.bookIds = data.bookIds;
+  this.bookId = this.isOnlyOneBook() ? this.bookIds[0] : 0;
   this.word = data.word;
   this.contexts = data.contexts;
   this.books = data.books;
@@ -15,68 +18,92 @@ ListPage = function(data) {
   this.hoverCard = null;
   this.searchbar = null;
 };
+util.inherits(ListPage, Component);
 
 
 ListPage.prototype.render = function(contentElement) {
   this.contentElement = contentElement;
 
-  util.renderSoy(this.contentElement, listpage.templates.main, {
+  soy.renderElement(this.contentElement, listpage.templates.main, {
     contexts: this.contexts,
-    bookId: this.bookId,
+    bookIds: this.bookIds,
     word: this.word,
-    books: this.books
+    books: this.books,
   });
 
-  this.searchbar = Searchbar.init(this.books, this.bookId, this.word);
+  this.searchbar = new Searchbar(this.books);
+  this.searchbar.render(this.find('#search-bar-container'));
+  this.searchbar.setWord(this.word);
+  if (this.isOnlyOneBook()) {
+    this.searchbar.selectBook(this.books[this.bookIds[0]]);
+  }
 
-  $('.context-section-expander').click(
-      util.bind(this.onExpanderClicked, this));
+  this.listenAll(this.findAll('.context-section-expander'),
+      'click', this.onExpanderClicked);
 
   this.hoverCard = new Hovercard().setContent(new Menu([
     {
       text: 'Show Word Index',
       action: util.bind(function(){
         window.location.href =
-            '/wordcounts?bookId=' + this.bookId;
+            '/wordcounts?bookId=' +
+            util.dom.getData(this.hoverCard.anchor, 'bookId');
       }, this)
     }
   ]));
   this.hoverCard.showOnHover($('.book-title'));
-  this.loadChunk();
+  this.loadChunk(100);
 };
 
 
-ListPage.prototype.loadChunk = function() {
+ListPage.prototype.loadChunk = function(count) {
   $.ajax({
     url: '/getcontext/index',
     data: {
       startIndex: this.contexts.length,
+      count: 100,
       beforeCount: 25,
       afterCount: 25,
       word: this.word,
-      bookId: this.bookId
+      bookIds: this.bookIds.join(',')
     },
-    success: util.bind(this.onContextsLoaded, this),
+    success: util.bind(this.onContextsLoaded, this, 100),
     error: function(){console.log(arguments)}
   });
 };
 
 
-ListPage.prototype.onContextsLoaded = function(newContexts) {
-  $('#contexts-container')[0].innerHTML += listpage.templates.contextGroup({
-    contexts: newContexts
-  });
-  $('.context-section-expander').click(
-      util.bind(this.onExpanderClicked, this));
+ListPage.prototype.onContextsLoaded = function(expect, newContexts) {
+  var startIndex = this.contexts.length;
+  util.array.pushAll(this.contexts, newContexts);
+  var newContextGroup = soy.renderAsElement(
+      listpage.templates.contextGroup,
+      {
+        startIndex: startIndex,
+        contexts: newContexts,
+        books: this.books
+      });
+  this.find('#contexts-container').appendChild(newContextGroup);
+  this.listenAll(util.dom.findAll('.context-section-expander', newContextGroup),
+      'click', this.onExpanderClicked);
+  if (newContexts.length == expect) {
+    this.loadChunk(100);
+  }
 };
 
 
 ListPage.prototype.onExpanderClicked = function(event) {
-  var $target = $(event.target);
-  var position = parseInt($target.attr('data-position'));
-  var beforeCount = parseInt($target.attr('data-before'));
-  var afterCount = parseInt($target.attr('data-after'));
-  var isUpExpand = $target.hasClass('expander-top');
+  var target = event.target;
+  var contextIndex = util.dom.getIntData(
+      util.dom.getClosest(target, '.context-section'),
+      'contextIndex');
+  var context = this.contexts[contextIndex];
+
+  var bookId = context.bookId;
+  var position = context.token.position;
+  var beforeCount = context.before.length;
+  var afterCount = context.after.length;
+  var isUpExpand = util.dom.hasClass(target, 'expander-top');
 
   $.ajax({
     url: '/getcontext/position',
@@ -84,15 +111,16 @@ ListPage.prototype.onExpanderClicked = function(event) {
       positions: position,
       beforeCount: beforeCount + (isUpExpand ? 100 : 0),
       afterCount: afterCount + (isUpExpand ? 0 : 100),
-      bookId: this.bookId
+      bookId: bookId
     },
-    success: util.bind(this.onGetExpandedContext, this, isUpExpand),
+    success: util.bind(this.onGetExpandedContext,
+        this, contextIndex, isUpExpand),
     error: function(){console.log(arguments)}
   });
 };
 
 ListPage.prototype.shift = function(delta) {
-  var contextsContainer = $('#cards-container');
+  var contextsContainer = this.find('#cards-container');
   contextsContainer.css('marginTop',
       (parseInt(contextsContainer.css('marginTop')) + delta + 'px'));
 }
@@ -106,27 +134,32 @@ ListPage.prototype.shift = function(delta) {
  *     expand.
  * @param {Array.<Object>} contexts An array with a single context element.
  */
-ListPage.prototype.onGetExpandedContext = function(isUpExpand, contexts) {
-  var context = contexts[0];
-  var containerId = '#context-section-' + context.token.position;
+ListPage.prototype.onGetExpandedContext =
+    function(contextIndex, isUpExpand, contexts) {
+  var context = util.array.getOnlyElement(contexts);
+  this.contexts[contextIndex] = context;
+  var containerId = '#context-section-' + contextIndex;
   this.slideTextToFit(containerId,
-      listpage.templates.context({context: context}),
+      listpage.templates.context({
+        context: context,
+        book: this.books[context.bookId]
+      }),
       isUpExpand);
 
-  $(containerId + ' .context-section-expander').click(
-      util.bind(this.onExpanderClicked, this));
+  this.listenAll(this.findAll(containerId + ' .context-section-expander'),
+      'click', this.onExpanderClicked);
 };
 
 
 ListPage.prototype.slideTextToFit = function(sectionId, text, isUpExpand) {
   // This is a bunch of assorted hackery for making the smooth exanding cards
   var initialHeight = getComputedStyle(
-      $(sectionId + ' .context-section-text')[0]).height;
+      this.find(sectionId + ' .context-section-text')).height;
 
-  $(sectionId)[0].innerHTML = text;
+  this.find(sectionId).innerHTML = text;
   // Note that when we reset the html of the section in the line above,
   // we reset the dom.
-  var textSection = $(sectionId + ' .context-section-text')[0];
+  var textSection = this.find(sectionId + ' .context-section-text');
   var finalHeight = getComputedStyle(textSection).height;
 
   textSection.style.height = initialHeight;
@@ -148,4 +181,8 @@ ListPage.prototype.slideTextToFit = function(sectionId, text, isUpExpand) {
       scrollTop: $(window).scrollTop() + delta
     }, 400);
   }
+};
+
+ListPage.prototype.isOnlyOneBook = function() {
+  return this.bookIds.length == 1;
 };

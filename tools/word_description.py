@@ -33,6 +33,10 @@ common = [
   "from",
   "which",
   "but",
+  "do",
+  "does",
+  "did",
+  "there",
   "-",
   "--",
   "."

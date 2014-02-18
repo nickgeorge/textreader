@@ -1,19 +1,19 @@
 #!/usr/bin/python
 
-import sys,getopt
+import sys
 import cgi, cgitb
 import json
 import re
 import urllib2
 import flaf_tracer
 import flaf_db
-
 cgitb.enable()
 
 class Indexer:
   def __init__(self, conn):
     self.conn = conn
     self.cursor = conn.cursor()
+
 
   def addToBooksByPath(self, title, author, path):
     self.cursor.execute('INSERT INTO books (title, author, text) ' +
@@ -25,7 +25,27 @@ class Indexer:
     self.conn.commit()
     return int(self.cursor.lastrowid)
 
-  def addToWordIndex(self, bookId):
+
+  def addToBooksByText(self, title, author, text):
+    self.cursor.execute('INSERT INTO books (title, author, text) ' +
+        'VALUES ("%s", "%s", "%s")' % (
+            self.conn.escape_string(title),
+            self.conn.escape_string(author),
+            self.conn.escape_string(text)
+        ))
+    self.conn.commit()
+    return int(self.cursor.lastrowid)
+
+
+  def deleteFromIndexes(self, bookId):
+    self.cursor.execute('DELETE FROM word_index WHERE book_id = %s' % bookId);
+    self.cursor.execute('DELETE FROM word_counts WHERE book_id = %s' % bookId);
+    self.conn.commit()
+
+  # def deleteBookByTitleAndAuthor(self, title, author):
+  #   self.cursor.execute(
+
+  def addToIndexes(self, bookId):
     self.cursor.execute('SELECT text FROM books WHERE book_id=' + str(bookId))
 
     rawtext = ''
@@ -34,58 +54,52 @@ class Indexer:
       rawtext = row[0]
 
     # find all 'tokens', where a token is defined to be a consecutive string of
-    # non-whitespace characters, OR a consecutive string of hyphens.
-    # The hypens are necessary because-and this is a demonstration-use hypens
-    # w
+    # non-hyphen non-whitespace characters.  Hyphens (and groups of hyphens must
+    # be treated as separate tokens because some authors-I won't name names-use
+    # hyphens like that.
     tokens =  re.findall('-+|[^\s-]+', rawtext)
 
     # build pattern for 'words' where a word is defined to be a consecutive string
-    # of letters,
-    wordlikePattern = re.compile('[A-Za-z\']+')
+    # of letters, numbers, and single-quotes, not counting initial or trailing
+    # single quotes
+    wordlikePattern = re.compile('[A-Za-z0-9]+([\'\.]+[A-Za-z0-9]+)*')
 
     counts = {}
     indexArray = [];
     for position, token in enumerate(tokens):
       wordMatch = wordlikePattern.search(token)
       word = token if not bool(wordMatch) else wordMatch.group(0).lower()
-      escapedWord = self.conn.escape_string(word)
+      word = word
 
-      if escapedWord in counts:
-        counts[escapedWord] += 1
+      if word in counts:
+        counts[word] += 1
       else:
-        counts[escapedWord] = 1
-
+        counts[word] = 1
 
       indexArray.append((
-          escapedWord,
+          word,
           bookId,
           position,
-          self.conn.escape_string(token)
+          token
       ))
 
     countsArray = []
     for word in counts:
       if (len(word) > 30):
-        print(word)
+        print('Too long: ' + word)
       countsArray.append(
-          (bookId, self.conn.escape_string(word), counts[word]))
+          (bookId, word, counts[word]))
 
-    self.cursor.execute('INSERT INTO word_counts (book_id, word, count) VALUES ' +
-        ', '.join(map(str, countsArray)))
+    self.cursor.execute(
+        'INSERT INTO word_counts (book_id, word, count) ' +
+        'VALUES ' +
+            ', '.join(map(str, countsArray)))
 
     totalWords = len(indexArray)
     for i in range(0, totalWords, 100000):
-      self.cursor.execute('INSERT INTO word_index (word, book_id, position, raw) VALUES ' +
-          ', '.join(map(str, indexArray[i:min(i + 100000, totalWords)])))
+      self.cursor.execute(
+          'INSERT INTO word_index (word, book_id, position, raw) ' +
+          'VALUES ' +
+              ', '.join(map(str, indexArray[i:min(i + 100000, totalWords)])))
 
     self.conn.commit()
-
-def main(argv):
-  optsList = getopt.getopt(argv, [], ['title=' ,'author=', 'path='])[0]
-  opts = dict(optsList)
-  indexer = Indexer(flaf_db.newConn())
-  bookId = indexer.addToBooks(opts['--title'], opts['--author'], opts['--path'])
-  indexer.addToWordIndex(13)
-
-if __name__ == "__main__":
-   main(sys.argv[1:])

@@ -1,3 +1,7 @@
+#main-content {
+  padding-top: 55px;
+}
+
 .word-counts-container {
   min-height: 52000px;
   transition: background 1s ease-out;

@@ -4,7 +4,7 @@
 
 
 .context-section {
-  border-radius: 4px;
+  border-radius: 0px 0px 4px 0px;
 }
 
 .context-section-expander {
@@ -15,6 +15,12 @@
   margin-right: auto;
   box-shadow: 1px 1px 1px #888888;
   cursor: pointer;
+}
+
+.context-section-title {
+  font-size: 12px;
+  font-weight: bold;
+  color: #b22222;
 }
 
 .context-section-text {

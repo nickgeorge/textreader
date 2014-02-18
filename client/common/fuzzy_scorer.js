@@ -24,6 +24,7 @@ FuzzyScorer.option;
  */
 FuzzyScorer.match;
 
+
 /**
  * @typedef {
  *   searchIndex: number,
@@ -33,11 +34,13 @@ FuzzyScorer.match;
  */
 FuzzyScorer.State_;
 
+
 FuzzyScorer.INITIAL_STATE_ = {
   searchIndex: 0,
   optionIndex: 0,
   consecutive: 0
 };
+
 
 FuzzyScorer.INVALID_ = -1;
 
@@ -49,13 +52,14 @@ FuzzyScorer.prototype.match = function(searchString) {
   }, this);
 
   matches = matches.filter(function(match) {
-    return match.score > 0;
+    return match.score !=  FuzzyScorer.INVALID_;
   });
   matches.sort(function(a, b) {
     return b.score - a.score;
   });
   return matches;
 };
+
 
 FuzzyScorer.prototype.scoreOption = function(searchString, option, state) {
   if (state.searchIndex == searchString.length) {
