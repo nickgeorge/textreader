@@ -2,9 +2,8 @@ import sys
 import json
 import flaf_tracer
 
-
 def writeHeader():
-  print("Content-type:text/html\r\n\r\n")
+  print("Content-type:text/html charset=utf-8\r\n\r\n")
 def writeJsonHeader():
   print("Content-type:application/json\r\n\r\n")
 
@@ -34,6 +33,7 @@ class Document:
     self.require('common/utils/util.js')
     self.require('common/utils/soyutils.js')
     self.require('common/utils/jquery/1.10.2/jquery.min.js')
+    self.require('common/event_source.js')
     self.require('common/component.js')
     self.addCss('common/common.css')
 

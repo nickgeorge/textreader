@@ -7,22 +7,26 @@ util.useCss('list_page.css');
 
 
 ListPage = function(data) {
-  util.base();
+  util.base(this);
 
   this.bookIds = data.bookIds;
   this.bookId = this.isOnlyOneBook() ? this.bookIds[0] : 0;
   this.word = data.word;
   this.contexts = data.contexts;
   this.books = data.books;
-  this.contentElement = null;
-  this.hoverCard = null;
   this.searchbar = null;
+  this.hovercard = new Hovercard();
+  this.menu = new Menu([
+    {
+      text: 'Show Word Index',
+      value: 'word-index'
+    }
+  ]);
 };
 util.inherits(ListPage, Component);
 
 
-ListPage.prototype.render = function(contentElement) {
-  this.contentElement = contentElement;
+ListPage.prototype.createDom = function(contentElement) {
 
   soy.renderElement(this.contentElement, listpage.templates.main, {
     contexts: this.contexts,
@@ -34,25 +38,28 @@ ListPage.prototype.render = function(contentElement) {
   this.searchbar = new Searchbar(this.books);
   this.searchbar.render(this.find('#search-bar-container'));
   this.searchbar.setWord(this.word);
-  if (this.isOnlyOneBook()) {
-    this.searchbar.selectBook(this.books[this.bookIds[0]]);
-  }
+  // if (this.isOnlyOneBook()) {
+  //   this.searchbar.selectBookId(this.bookIds[0]);
+  // }
 
   this.listenAll(this.findAll('.context-section-expander'),
       'click', this.onExpanderClicked);
 
-  this.hoverCard = new Hovercard().setContent(new Menu([
-    {
-      text: 'Show Word Index',
-      action: util.bind(function(){
-        window.location.href =
-            '/wordcounts?bookId=' +
-            util.dom.getData(this.hoverCard.anchor, 'bookId');
-      }, this)
-    }
-  ]));
-  this.hoverCard.showOnHover($('.book-title'));
+  this.hovercard.initialize();
+  this.hovercard.setContent(this.menu);
+  this.menu.setHovercard(this.hovercard);
+  this.hovercard.setOffset({top: -4, left: 0});
+  this.hovercard.showOnHover(this.find('.book-title'));
+
+  this.listen(this.menu, Menu.EventType.SELECT, this.onMenuSelect);
+
   this.loadChunk(100);
+};
+
+ListPage.prototype.onMenuSelect = function(event) {
+  window.location.href =
+      '/wordcounts?bookId=' +
+      util.dom.getData(this.hovercard.getAnchor(), 'bookId');
 };
 
 

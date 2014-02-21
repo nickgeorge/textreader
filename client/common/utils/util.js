@@ -197,6 +197,10 @@ util.dom.getIntData = function(element, key) {
   return parseInt(element.dataset[key]);
 };
 
+util.dom.hide = function(element) {
+  element.style.display = 'none';
+};
+
 
 /********************/
 /*      util.fn     */
@@ -249,6 +253,12 @@ util.fn.greaterThan = function(ref) {
   return function(test) {
     return test > ref;
   }
+};
+
+util.fn.goTo = function(url) {
+  return function() {
+    window.location.href = url;
+  };
 };
 
 

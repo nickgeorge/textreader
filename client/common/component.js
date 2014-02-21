@@ -1,6 +1,9 @@
 Component = function(){
+  util.forEach
+util.base(this);
   this.contentElement = null;
 };
+util.inherits(Component, EventSource);
 
 Component.prototype.render = function(element) {
   this.contentElement = element;
@@ -29,12 +32,3 @@ Component.prototype.findAll = function(selector) {
       this.getContentElement().querySelectorAll(selector), 0);
 };
 
-Component.prototype.listen = function(element, type, handler, opt_ctx) {
-  element.addEventListener(type, util.bind(handler, opt_ctx || this));
-};
-
-Component.prototype.listenAll = function(elements, type, handler, opt_ctx) {
-  util.array.forEach(elements, function(element) {
-    element.addEventListener(type, util.bind(handler, opt_ctx || this));
-  }, this);
-};

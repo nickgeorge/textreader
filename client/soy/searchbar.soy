@@ -3,8 +3,20 @@
 /** */
 {template .main}
   <div id="search-bar">
-    <input  id="search-bar-book-input" type='text'></input>
-    <input  id="search-bar-word-input" type='text'></input>
+    <div id="search-bar-book">
+      <div id="search-bar-selected-books"></div>
+      <input id="search-bar-book-input" type='text'></input>
+    </div>
+    <input id="search-bar-word-input" type='text'></input>
     <button id="search-bar-button">Search</button>
+  </div>
+{/template}
+
+/**
+ * @param text
+ */
+{template .selectedblock}
+  <div class="search-bar-selected-block">
+    {$text}
   </div>
 {/template}

@@ -1,5 +1,7 @@
+#!/usr/bin/python3
+
 import flaf_types
-import cgitb
+import cgitb,sys
 import MySQLdb
 import flaf_tracer
 cgitb.enable()
@@ -16,7 +18,9 @@ def newConn():
   return MySQLdb.connect(host='localhost',
     user='nick',
     passwd= pw.strip(' \n'),
-    db='flaf')
+    db='flaf',
+    charset = "utf8",
+    use_unicode = True)
 
 """
   Data-access object (dao) for accessing mysql database.
@@ -28,6 +32,7 @@ class DbDao:
     self.conn = conn
     self.cursor = conn.cursor()
     self.tracer = flaf_tracer.Tracer('DbDao')
+    self.tracer.log("THE VERSION IS %s" % sys.version);
 
   """
     Returns an array of all books (see flaf_types)
@@ -37,6 +42,7 @@ class DbDao:
     self.cursor.execute('SELECT book_id, title, author FROM books')
     for row in self.cursor.fetchall():
       books[row[0]] = flaf_types.readBook(row)
+      self.tracer.log(row[1])
     return books
 
   """

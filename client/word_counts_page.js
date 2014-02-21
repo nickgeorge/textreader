@@ -7,7 +7,7 @@ util.useCss('word_counts_page.css');
 
 
 WordCountsPage = function(data) {
-  util.base();
+  util.base(this);
 
   this.wordCounts = data.wordCounts;
   this.maxWordCount = this.wordCounts[0][1];
@@ -15,8 +15,13 @@ WordCountsPage = function(data) {
   this.bookId = data.bookId;
   this.requestInFlight = false;
   this.wordHovercard = new Hovercard();
-  this.graphTypeHovercard = new Hovercard();
   this.searchbar = null;
+  this.wordMenu = new Menu([
+    {
+      text: 'See in ' + this.books[this.bookId].title,
+      value: 'listpage'
+    }
+  ]);
 };
 util.inherits(WordCountsPage, Component);
 
@@ -45,19 +50,14 @@ WordCountsPage.prototype.createDom = function() {
 
   this.findAll('.word-count-bar').forEach(this.setBarSize, this);
 
-  this.wordHovercard.setContent(
-      new Menu([
-        {
-          text: 'See in ' + this.books[this.bookId].title,
-          action: util.bind(function(anchor){
-            console.log(this.wordHovercard.anchor);
-            window.location.href = '/search?bookIds=' + this.bookId +
-                '&word=' + this.wordHovercard.anchor.innerHTML;
-          }, this)
-        }
-      ]));
-  this.wordHovercard.showOnHover(
-      $(this.contentElement).find('.word-count-word'));
+  this.wordHovercard.initialize();
+  this.wordHovercard.setContent(this.wordMenu);
+  this.wordMenu.setHovercard(this.wordHovercard);
+  this.wordHovercard.showOnHover(this.findAll('.word-count-word'));
+  this.listen(this.wordMenu, Menu.EventType.SELECT, function(event) {
+    window.location.href = '/search?bookIds=' + this.bookId +
+        '&word=' + event.anchor.innerHTML;
+  });
 
   $(window).scroll(util.bind(this.maybeGetCounts, this));
 };

@@ -37,3 +37,17 @@
     </div>
   </div>
 {/template}
+
+/**
+ * @param words
+ */
+{template .wordlist}
+  <div>
+    {foreach $word in $words}
+      <div class="word-list-item"
+          data-word="{$word}">
+        {$word}
+      </div>
+    {/foreach}
+  </div>
+{/template}

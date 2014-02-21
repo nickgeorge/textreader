@@ -10,8 +10,8 @@
 def newToken(position, word, raw):
   return {
     'position': int(position),
-    'word': unicode(word, errors='replace'),
-    'raw': unicode(raw, errors='replace')
+    'word': word,
+    'raw': raw
   }
 
 def readToken(row):
@@ -28,8 +28,8 @@ def readToken(row):
 def newBook(id, title, author):
   return {
     'id': int(id),
-    'title': unicode(title, errors='replace'),
-    'author': unicode(author, errors='replace')
+    'title': title,
+    'author': author
   }
 
 def readBook(row):

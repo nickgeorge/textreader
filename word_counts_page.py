@@ -1,5 +1,8 @@
 #!/usr/bin/python
 
+import sys, os
+sys.path.insert(0, os.path.dirname(__file__))
+
 import cgi, cgitb
 import json
 from common import document

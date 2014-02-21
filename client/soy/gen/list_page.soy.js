@@ -41,7 +41,7 @@ listpage.templates.contextGroup = function(opt_data, opt_ignored) {
 listpage.templates.context = function(opt_data, opt_ignored) {
   var output = '';
   var position__soy58 = opt_data.context.token.position;
-  output += '<div class="context-section-expander expander-top"></div><div class="context-section-title">' + soy.$$escapeHtml(opt_data.book.title) + ' - ' + soy.$$escapeHtml(position__soy58) + '</div><div class="context-section-text">' + ((position__soy58 - opt_data.context.before.length > 1) ? '...' : '');
+  output += '<div class="context-section-expander expander-top"></div><div class="context-section-title">' + soy.$$escapeHtml(opt_data.book.title) + ' - Word ' + soy.$$escapeHtml(position__soy58) + '</div><div class="context-section-text">' + ((position__soy58 - opt_data.context.before.length > 1) ? '...' : '');
   var tokenList67 = opt_data.context.before;
   var tokenListLen67 = tokenList67.length;
   for (var tokenIndex67 = 0; tokenIndex67 < tokenListLen67; tokenIndex67++) {

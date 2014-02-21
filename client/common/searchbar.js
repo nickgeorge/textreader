@@ -6,13 +6,12 @@ util.useCss('common/searchbar.css');
 
 Searchbar = function(books) {
   this.books = books;
-  this.bookId = 0;
   this.initialWord = '';
   this.menu = new Menu([]);
   this.hovercard = new Hovercard();
   this.scorer = new FuzzyScorer(util.object.toArray(books, function(book) {
     return {
-      value: book,
+      value: book.id,
       text: book.title
     }
   }, this));
@@ -26,6 +25,7 @@ Searchbar.prototype.createDom = function() {
 
   this.bookInput = this.find('#search-bar-book-input');
   this.wordInput = this.find('#search-bar-word-input');
+  this.hovercard.initialize();
   this.hovercard.setContent(this.menu);
   this.hovercard.setAnchor(this.bookInput);
   this.hovercard.setOffset({top: 2, left: 0});
@@ -58,7 +58,6 @@ Searchbar.prototype.createDom = function() {
 
   this.listen(document.body, 'click', function(event) {
     if (util.dom.isChild(event.target, this.bookInput)) {
-      // this.buildMenu();
       this.bookInput.select();
     } else {
       this.hovercard.hide();
@@ -66,15 +65,28 @@ Searchbar.prototype.createDom = function() {
   });
   this.buildMenu(false);
   this.menu.listenForKeys(this.bookInput, util.bind(this.buildMenu, this));
+  this.listen(this.menu, Menu.EventType.SELECT, this.handleMenuKey);
+};
+
+Searchbar.prototype.handleMenuKey = function(menuEvent) {
+  this.bookInput.value = '';
+  util.array.forEach(menuEvent.values, function(value) {
+    this.find('#search-bar-selected-books').appendChild(
+        soy.renderAsElement(searchbar.templates.selectedblock, {
+          text: this.books[value].title
+        }));
+  }, this);
+  this.hovercard.hide();
 };
 
 Searchbar.prototype.buildMenu = function(opt_show) {
   var matches = this.scorer.match(this.bookInput.value);
   var menuOptions = matches.map(util.bind(function(match) {
+    var book = this.books[match.option.value];
     return {
-      text: match.option.text,
-      indices: match.indices,
-      action: util.bind(this.selectBook, this, match.option.value)
+      text: book.title,
+      value: book.id,
+      indices: match.indices
     };
   }, this));
   this.menu.setOptions(menuOptions);
@@ -85,16 +97,11 @@ Searchbar.prototype.buildMenu = function(opt_show) {
 Searchbar.prototype.onSearchButtonClicked = function() {
   var word = this.wordInput.value;
   if (word) {
-    window.location.href = '/search?bookIds=' + this.bookId + '&word=' + word;
+    window.location.href = '/search?bookIds=' +
+        this.menu.getSelected().join(',') + '&word=' + word;
   } else {
     window.location.href = '/wordcounts?bookId=' + this.bookId;
   }
-};
-
-Searchbar.prototype.selectBook = function(book) {
-  this.bookInput.value = book.title;
-  this.bookId = book.id;
-  this.hovercard.hide();
 };
 
 Searchbar.prototype.setWord = function(word) {
