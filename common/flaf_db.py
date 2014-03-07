@@ -16,11 +16,11 @@ def newConn():
       pw = f.read()
 
   return MySQLdb.connect(host='localhost',
-    user='nick',
+    user='textreader',
     passwd= pw.strip(' \n'),
-    db='flaf',
-    charset = "utf8",
-    use_unicode = True)
+    db='flaf')
+    #charset = "utf8",
+    #use_unicode = True)
 
 """
   Data-access object (dao) for accessing mysql database.
@@ -32,7 +32,8 @@ class DbDao:
     self.conn = conn
     self.cursor = conn.cursor()
     self.tracer = flaf_tracer.Tracer('DbDao')
-    self.tracer.log("THE VERSION IS %s" % sys.version);
+
+    #self.cursor.execute('SET NAMES utf8')
 
   """
     Returns an array of all books (see flaf_types)

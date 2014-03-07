@@ -9,7 +9,7 @@ oldSum=""
 
 while [[ true ]]
 do
-    newSum=`find client/soy/* -type f -exec md5sum {} \;`
+    newSum=`find client/soy/* -type f -exec md5 {} \;`
     if [[ $oldSum != $newSum ]] ; then
         echo "Recompiling soy..."
         result=$(java -jar SoyToJsSrcCompiler.jar \
