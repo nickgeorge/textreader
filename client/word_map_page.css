@@ -47,7 +47,7 @@
 }
 
 .node-book {
-  background-color: #22b2b2;
+  background-color: #79FFFF;
   width: 100px;
   height: 100px;
   margin-left: -50px;
@@ -77,5 +77,5 @@
 }
 
 .word-list-item-hover {
-  color: #b22222;
+  color: #FF15EC;
 }

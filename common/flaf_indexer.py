@@ -13,6 +13,7 @@ class Indexer:
   def __init__(self, conn):
     self.conn = conn
     self.cursor = conn.cursor()
+    self.tracer = flaf_tracer.Tracer('Indexer')
 
 
   def addToBooksByPath(self, title, author, path):
@@ -37,9 +38,11 @@ class Indexer:
     return int(self.cursor.lastrowid)
 
 
-  def deleteFromIndexes(self, bookId):
+  def deleteFromIndexes(self, bookId, deleteFromBooks=False):
     self.cursor.execute('DELETE FROM word_index WHERE book_id = %s' % bookId);
     self.cursor.execute('DELETE FROM word_counts WHERE book_id = %s' % bookId);
+    if deleteFromBooks:
+      self.cursor.execute('DELETE FROM books WHERE book_id = %s' % bookId)
     self.conn.commit()
 
   # def deleteBookByTitleAndAuthor(self, title, author):
@@ -90,10 +93,13 @@ class Indexer:
       countsArray.append(
           (bookId, word, counts[word]))
 
-    self.cursor.execute(
-        'INSERT INTO word_counts (book_id, word, count) ' +
+    wordCountsInsertCommand = ('INSERT INTO word_counts (book_id, word, count) ' +
         'VALUES ' +
             ', '.join(map(str, countsArray)))
+
+    # self.tracer.log(wordCountsInsertCommand)
+
+    self.cursor.execute(wordCountsInsertCommand)
 
     totalWords = len(indexArray)
     for i in range(0, totalWords, 100000):
@@ -103,3 +109,40 @@ class Indexer:
               ', '.join(map(str, indexArray[i:min(i + 100000, totalWords)])))
 
     self.conn.commit()
+
+
+  def indexByGutenbergId(self, gutId, title, author):
+    self.cursor.execute('SELECT book_id FROM books WHERE ' +
+        'title=\'%s\' AND author=\'%s\'' % (title, author))
+
+    for row in self.cursor.fetchall():
+      self.deleteFromIndexes(row[0], deleteFromBooks=True)
+      self.tracer.log(str(row[0]))
+
+    gutenbergUrl = 'http://www.gutenberg.org/cache/epub/%s/pg%s.txt';
+
+    opener = urllib2.build_opener(urllib2.ProxyHandler({}))
+    urllib2.install_opener(opener)
+
+    text = urllib2.urlopen(gutenbergUrl % (gutId, gutId)).read()
+
+    startIndex = re.search('^\*\*\* START [^\*]*\*\*\*', text, re.MULTILINE).end()
+    endIndex = re.search('^\*\*\* END [^\*]*\*\*\*', text, re.MULTILINE).start()
+
+    text = text[startIndex:endIndex]
+
+    producedMatch = re.search('^Produced by.*', text, re.MULTILINE)
+    if producedMatch and producedMatch.start() < 20:
+      text = text[producedMatch.end():]
+
+
+    secondEndMatch = re.search('^End of (the )?Project Gutenberg',
+        text, re.MULTILINE)
+    if secondEndMatch:
+      text = text[:secondEndMatch.start()]
+    bookId = self.addToBooksByText(title, author, text)
+    self.addToIndexes(bookId)
+
+
+
+

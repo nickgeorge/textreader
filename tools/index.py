@@ -41,28 +41,6 @@ if args.action == 'add':
     print('Error: --gut_id, --author, --title must be set to add book.')
     sys.exit(1)
 
-  gutenbergUrl = 'http://www.gutenberg.org/cache/epub/%s/pg%s.txt';
+    indexer.indexByGutenbergId(args.gutId, args.title, args.author)
 
-  opener = urllib2.build_opener(urllib2.ProxyHandler({}))
-  urllib2.install_opener(opener)
-
-  text = urllib2.urlopen(gutenbergUrl % (args.gutId, args.gutId)).read()
-
-  startIndex = re.search('^\*\*\* START [^\*]*\*\*\*', text, re.MULTILINE).end()
-  endIndex = re.search('^\*\*\* END [^\*]*\*\*\*', text, re.MULTILINE).start()
-
-  text = text[startIndex:endIndex]
-
-  producedMatch = re.search('^Produced by.*', text, re.MULTILINE)
-  if producedMatch and producedMatch.start() < 20:
-    text = text[producedMatch.end():]
-
-
-  secondEndMatch = re.search('^End of (the )?Project Gutenberg',
-      text, re.MULTILINE)
-  if secondEndMatch:
-    text = text[:secondEndMatch.start()]
-  # print(text)
-  bookId = indexer.addToBooksByText(args.title, args.author, text)
-  indexer.addToIndexes(bookId)
 
