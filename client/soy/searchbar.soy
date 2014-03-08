@@ -3,20 +3,22 @@
 /** */
 {template .main}
   <div id="search-bar">
-    <div id="search-bar-book">
+    <span id="search-bar-book">
       <div id="search-bar-selected-books"></div>
       <input id="search-bar-book-input" type='text'></input>
-    </div>
+    </span>
     <input id="search-bar-word-input" type='text'></input>
     <button id="search-bar-button">Search</button>
   </div>
 {/template}
 
 /**
- * @param text
+ * @param titles
  */
-{template .selectedblock}
-  <div class="search-bar-selected-block">
-    {$text}
-  </div>
+{template .selectedblocks}
+  {foreach $title in $titles}
+    <div class="search-bar-selected-block">
+      {$title}
+    </div>
+  {/foreach}
 {/template}

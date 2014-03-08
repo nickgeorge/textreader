@@ -5,7 +5,6 @@ Menu = function(options) {
   util.base(this);
 
   this.options = options;
-  this.selectedIndices = [];
   this.highlitIndex = 0;
   this.hovercard = null;
 };
@@ -27,11 +26,7 @@ Menu.prototype.setOptions = function(options) {
 
 Menu.prototype.createDom = function() {
   this.buildMenuOptions();
-  this.listen(this.getContentElement(), 'click', function(event) {
-    var menuItem = util.dom.getClosest(event.target, '.menu-item');
-    this.selectedIndices.push(util.dom.getData(menuItem, 'index'));
-    this.fireSelect();
-  });
+  this.listen(this.getContentElement(), 'click', this.onClick);
 };
 
 Menu.prototype.buildMenuOptions = function() {
@@ -60,16 +55,10 @@ Menu.prototype.getAnchor = function() {
   return this.hovercard ? this.hovercard.getAnchor() : null;
 };
 
-Menu.prototype.getSelected = function() {
-  return this.selectedIndices.map(util.bind(function(index) {
-    return this.options[index].value;
-  }, this));
-};
-
 Menu.prototype.listenForKeys = function(element, callback) {
   callback = callback || function(){};
   this.listen(element, 'keydown', function(event) {
-    var caught = true;
+    var preventDefault = true;
     switch (event.keyCode) {
       case util.events.KeyCodes.UP:
         this.highlitIndex--;
@@ -80,17 +69,22 @@ Menu.prototype.listenForKeys = function(element, callback) {
       case util.events.KeyCodes.ENTER:
       case util.events.KeyCodes.COMMA:
         if (this.options.length > 0) {
-          this.selectedIndices = [this.highlitIndex];
-          this.fireSelect();
+          this.fireSelect(this.highlitIndex);
         }
+        break;
+      case util.events.KeyCodes.BACKSPACE:
+        if (element.value == '') {
+          this.firePop();
+        }
+        preventDefault = false;
         break;
       case util.events.KeyCodes.ESC:
         break;
       default:
-        caught = false;
+        preventDefault = false;
         break;
     }
-    if (caught) event.preventDefault();
+    if (preventDefault) event.preventDefault();
     this.highlightSelected();
   });
 
@@ -109,20 +103,29 @@ Menu.prototype.listenForKeys = function(element, callback) {
   });
 };
 
+Menu.prototype.onClick = function(event) {
+  var menuItem = util.dom.getClosest(event.target, '.menu-item');
+  this.fireSelect(util.dom.getData(menuItem, 'index'));
+};
 
 Menu.prototype.fireSelect = function(index) {
   this.dispatchEvent(new Menu.Event(Menu.EventType.SELECT,
-      this.getSelected(), this.getAnchor(), event));
+      this.options[index].value, this.getAnchor(), event));
 };
 
+Menu.prototype.firePop = function() {
+  this.dispatchEvent(new Menu.Event(Menu.EventType.POP));
+};
 
-Menu.Event = function(type, values, anchor, opt_event) {
+Menu.Event = function(type, opt_value, opt_anchor, opt_event) {
   this.type = type;
-  this.values = values;
-  this.anchor = anchor;
+  this.value = opt_value || null;
+  this.anchor = opt_anchor || null;
   this.originalEvent = opt_event || null;
 };
 
 Menu.EventType = {
-  SELECT: 'select'
+  SELECT: 'select',
+  ACTION: 'action',
+  POP: 'pop'
 };

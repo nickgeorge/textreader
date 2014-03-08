@@ -1,4 +1,5 @@
 util.require('word_map.soy');
+util.require('common/searchbar.js');
 util.require('common/hovercard.js');
 util.require('common/menu.js');
 util.useCss('word_map_page.css');
@@ -7,7 +8,6 @@ WordMapPage = function(data) {
   util.base(this);
 
   this.bookIds = data.bookIds;
-  this.selectedBookIds = data.selectedBookIds;
   this.booksData = data.allBooks;
   this.uncommonShared = data.uncommonShared;
   this.commonUnsharedMap = data.commonUnsharedMap;
@@ -18,6 +18,7 @@ WordMapPage = function(data) {
       value: 'context'
     }
   ]);
+  this.searchbar = null;
 
   this.wordListContainer = null;
   this.wordListPlaceholder = null;
@@ -29,6 +30,10 @@ WordMapPage.prototype.createDom = function() {
     booksData: this.booksData,
     bookIds: this.bookIds
   });
+
+  this.searchbar = new Searchbar(this.booksData);
+  this.searchbar.render(this.find('#search-bar-container'));
+  this.searchbar.setSelectedBookIds(this.bookIds);
 
   this.wordListContainer = this.find('.word-list-container');
   this.wordListPlaceholder = this.find('.word-list-placeholder');
@@ -57,7 +62,7 @@ WordMapPage.prototype.createDom = function() {
   this.hovercard.initialize();
   this.hovercard.setContent(this.menu);
   this.menu.setHovercard(this.hovercard);
-  this.hovercard.setOffset({top: -19, left: 45});
+  this.hovercard.setOffset({top: -19, left: -95});
 
   this.listen(this.menu, Menu.EventType.SELECT, function(event){
         var word = util.dom.getData(event.anchor, 'word');

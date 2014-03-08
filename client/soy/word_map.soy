@@ -6,6 +6,7 @@
  * @param bookIds
  */
 {template .main}
+  <div id="search-bar-container"></div>
   <div class="word-map-container">
     <div class="word-map-card">
       {foreach $bookId in $bookIds}
@@ -18,7 +19,8 @@
     </div>
     <div class="word-list-card">
       <div class="word-list-container"></div>
-      <div style="display: none;" class="word-list-placeholder">  Loading...
+      <div style="display: none;" class="word-list-placeholder">  
+        Loading...
       </div>
     </div>
   </div>

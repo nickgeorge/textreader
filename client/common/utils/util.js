@@ -325,6 +325,18 @@ util.array.forEach = function(arr, f, opt_ctx) {
   }
 };
 
+util.array.map = function(arr, f, opt_ctx) {
+  var l = arr.length;
+  var arr2 = arr;
+  var out = [];
+  for (var i = 0; i < l; i++) {
+    if (i in arr2) {
+      out.push(f.call(opt_ctx, arr2[i], i, arr))
+    }
+  }
+  return out;
+};
+
 util.array.getOnlyElement = function(arr) {
   util.assertEquals(1, arr.length,
       'Array must have only one element.  Length: ' + arr.length);

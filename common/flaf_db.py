@@ -12,7 +12,7 @@ cgitb.enable()
 """
 def newConn():
 
-  with file('password.txt', 'r') as f:
+  with file('/Users/nickgeorge/pwd/password.txt', 'r') as f:
       pw = f.read()
 
   return MySQLdb.connect(host='localhost',
@@ -43,7 +43,6 @@ class DbDao:
     self.cursor.execute('SELECT book_id, title, author FROM books')
     for row in self.cursor.fetchall():
       books[row[0]] = flaf_types.readBook(row)
-      self.tracer.log(row[1])
     return books
 
   """
@@ -51,7 +50,6 @@ class DbDao:
     (see flaf_types)
   """
   def chunk(self, bookId, start, end):
-    self.tracer.log('Getting chunk %s : %s' % (start, end))
     self.cursor.execute('SELECT book_id, position, word, raw FROM word_index ' +
         'WHERE position BETWEEN %s AND %s ' % (start, end) +
         'AND raw IS NOT NULL ' +
@@ -60,8 +58,6 @@ class DbDao:
     tokens = []
     for row in self.cursor.fetchall():
       tokens.append(flaf_types.readToken(row))
-
-    self.tracer.log('done chunking')
     return tokens
 
   """
@@ -122,8 +118,6 @@ class DbDao:
   def getContexts(self, requests):
     if not requests:
       return [];
-
-    self.tracer.log('making request for %s contexts' % len(requests))
     self.cursor.execute('SELECT position, word, raw, book_id FROM word_index ' +
         ' WHERE ' +
             '(' +
@@ -135,7 +129,6 @@ class DbDao:
                   ), requests)) +
             ') ' +
         'ORDER BY position')
-    self.tracer.log('done making request')
 
     # build map from position to token
     tokenMap = {}
@@ -145,7 +138,6 @@ class DbDao:
       if bookId not in tokenMap:
         tokenMap[bookId] = {};
       tokenMap[bookId][token['position']] = token
-    self.tracer.log('done packing token map')
 
     # build an array of contexts from the map, with one context object
     # per request.
@@ -184,7 +176,6 @@ class DbDao:
         'ORDER BY position ASC ');
     # Get location of all hits.
     cmd += 'LIMIT %s,%s' % (startIndex, count)
-    self.tracer.log(cmd)
     self.cursor.execute(cmd)
 
     contextRequests = [];
@@ -235,7 +226,6 @@ class DbDao:
                 ' + '.join(map(lambda bookId: 'in_%s ' % bookId, bookIds)) +
             ') <= 2 ' +
         'ORDER BY number_of_books ASC, word ASC;')
-    self.tracer.log(cmd)
     self.cursor.execute(cmd)
     words = {};
     for row in self.cursor.fetchall():
@@ -268,3 +258,7 @@ class DbDao:
     for row in self.cursor.fetchall():
       words[row[3] and str(bookIds[0]) or str(bookIds[1])].append(row[0])
     return words;
+
+
+
+

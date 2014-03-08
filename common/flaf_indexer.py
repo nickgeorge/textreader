@@ -110,8 +110,32 @@ class Indexer:
 
     self.conn.commit()
 
+  def addBookToTmp(self, gutId, text):
+    cmd = ('INSERT INTO tmp_books (gut_id, text) ' +
+        'VALUES (%s, \'%s\')' % (
+            int(gutId),
+            self.conn.escape_string(text)))
+    self.tracer.log(cmd)
+    self.cursor.execute(cmd)
+    self.conn.commit()
+    return int(self.cursor.lastrowid)
 
-  def indexByGutenbergId(self, gutId, title, author):
+  def saveBookFromTmp(self, gutId, title, author):
+    cmd = 'SELECT text FROM tmp_books WHERE tmp_id = %s' % gutId
+    self.tracer.log(cmd)
+    self.cursor.execute(cmd)
+
+    text = ''
+    # Only one row
+    for row in self.cursor.fetchall():
+      text = row[0]
+
+    bookId = self.addToBooksByText(title, author, text)    
+    self.addToIndexes(bookId)
+
+    return bookId
+
+  def deleteFromBooks(self, title, author):
     self.cursor.execute('SELECT book_id FROM books WHERE ' +
         'title=\'%s\' AND author=\'%s\'' % (title, author))
 
@@ -119,30 +143,11 @@ class Indexer:
       self.deleteFromIndexes(row[0], deleteFromBooks=True)
       self.tracer.log(str(row[0]))
 
-    gutenbergUrl = 'http://www.gutenberg.org/cache/epub/%s/pg%s.txt';
+  def deleteFromTmpBooks(self, title, author):
+    self.cursor.execute('SELECT tmp_id FROM tmp_books WHERE ' +
+        'title=\'%s\' AND author=\'%s\'' % (title, author))
 
-    opener = urllib2.build_opener(urllib2.ProxyHandler({}))
-    urllib2.install_opener(opener)
-
-    text = urllib2.urlopen(gutenbergUrl % (gutId, gutId)).read()
-
-    startIndex = re.search('^\*\*\* START [^\*]*\*\*\*', text, re.MULTILINE).end()
-    endIndex = re.search('^\*\*\* END [^\*]*\*\*\*', text, re.MULTILINE).start()
-
-    text = text[startIndex:endIndex]
-
-    producedMatch = re.search('^Produced by.*', text, re.MULTILINE)
-    if producedMatch and producedMatch.start() < 20:
-      text = text[producedMatch.end():]
-
-
-    secondEndMatch = re.search('^End of (the )?Project Gutenberg',
-        text, re.MULTILINE)
-    if secondEndMatch:
-      text = text[:secondEndMatch.start()]
-    bookId = self.addToBooksByText(title, author, text)
-    self.addToIndexes(bookId)
-
-
-
+    for row in self.cursor.fetchall():
+      self.cursor.execute('DELETE FROM tmp_books WHERE tmp_id=%s' % row[0])
+      self.tracer.log(str(row[0]))
 

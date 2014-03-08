@@ -10,7 +10,6 @@ ListPage = function(data) {
   util.base(this);
 
   this.bookIds = data.bookIds;
-  this.bookId = this.isOnlyOneBook() ? this.bookIds[0] : 0;
   this.word = data.word;
   this.contexts = data.contexts;
   this.books = data.books;
@@ -38,10 +37,8 @@ ListPage.prototype.createDom = function(contentElement) {
   this.searchbar = new Searchbar(this.books);
   this.searchbar.render(this.find('#search-bar-container'));
   this.searchbar.setWord(this.word);
-  // if (this.isOnlyOneBook()) {
-  //   this.searchbar.selectBookId(this.bookIds[0]);
-  // }
-
+  this.searchbar.setSelectedBookIds(this.bookIds);
+  
   this.listenAll(this.findAll('.context-section-expander'),
       'click', this.onExpanderClicked);
 

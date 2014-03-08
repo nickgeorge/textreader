@@ -6,7 +6,6 @@ util.useCss('common/searchbar.css');
 
 Searchbar = function(books) {
   this.books = books;
-  this.initialWord = '';
   this.menu = new Menu([]);
   this.hovercard = new Hovercard();
   this.scorer = new FuzzyScorer(util.object.toArray(books, function(book) {
@@ -15,6 +14,7 @@ Searchbar = function(books) {
       text: book.title
     }
   }, this));
+  this.selectedBookIds = [];
   this.bookInput = null;
   this.wordInput = null;
 };
@@ -59,32 +59,58 @@ Searchbar.prototype.createDom = function() {
   this.listen(document.body, 'click', function(event) {
     if (util.dom.isChild(event.target, this.bookInput)) {
       this.bookInput.select();
-    } else {
+    }
+    if (!util.dom.isChild(event.target, this.menu.getContentElement())) {
       this.hovercard.hide();
     }
   });
   this.buildMenu(false);
   this.menu.listenForKeys(this.bookInput, util.bind(this.buildMenu, this));
-  this.listen(this.menu, Menu.EventType.SELECT, this.handleMenuKey);
+  this.listen(this.menu, Menu.EventType.SELECT, this.handleMenuSelect);
+  this.listen(this.menu, Menu.EventType.POP, this.handleMenuPop);
 };
 
-Searchbar.prototype.handleMenuKey = function(menuEvent) {
+Searchbar.prototype.handleMenuSelect = function(menuEvent) {
+  this.selectedBookIds.push(menuEvent.value);
+
+  this.renderSelectedBooks();
   this.bookInput.value = '';
-  util.array.forEach(menuEvent.values, function(value) {
-    this.find('#search-bar-selected-books').appendChild(
-        soy.renderAsElement(searchbar.templates.selectedblock, {
-          text: this.books[value].title
-        }));
-  }, this);
+  this.menu.options = [];
   this.hovercard.hide();
 };
 
+Searchbar.prototype.handleMenuPop = function(menuEvent) {
+  this.selectedBookIds.pop();
+
+  this.renderSelectedBooks();
+  this.bookInput.value = '';
+  this.menu.options = [];
+  this.hovercard.hide();
+};
+
+Searchbar.prototype.renderSelectedBooks = function() {
+  var  titles = util.array.map(this.selectedBookIds, function(bookId) {
+    return this.books[bookId].title; 
+  }, this)
+
+  util.renderSoy(this.find('#search-bar-selected-books'),
+      searchbar.templates.selectedblocks, 
+      {
+        titles: titles
+      });
+
+};
+
 Searchbar.prototype.buildMenu = function(opt_show) {
-  var matches = this.scorer.match(this.bookInput.value);
+  var matches = this.bookInput.value ? 
+      this.scorer.match(this.bookInput.value) :
+      [];
+  matches = matches.slice(0, 5)
   var menuOptions = matches.map(util.bind(function(match) {
     var book = this.books[match.option.value];
     return {
       text: book.title,
+      value: book.id,
       value: book.id,
       indices: match.indices
     };
@@ -98,12 +124,21 @@ Searchbar.prototype.onSearchButtonClicked = function() {
   var word = this.wordInput.value;
   if (word) {
     window.location.href = '/search?bookIds=' +
-        this.menu.getSelected().join(',') + '&word=' + word;
-  } else {
-    window.location.href = '/wordcounts?bookId=' + this.bookId;
+        this.selectedBookIds.join(',') + '&word=' + word;
+  } else if (this.selectedBookIds.length == 1) {
+    window.location.href = '/wordcounts?bookId=' +
+        util.array.getOnlyElement(this.selectedBookIds);
+  } else if (this.selectedBookIds.length > 0) {
+    window.location.href = '/wordmap?bookIds=' +
+        this.selectedBookIds.join(',');
   }
 };
 
 Searchbar.prototype.setWord = function(word) {
   this.wordInput.value = word;
+};
+
+Searchbar.prototype.setSelectedBookIds = function(bookIds) {
+  this.selectedBookIds = bookIds;
+  this.renderSelectedBooks();
 };

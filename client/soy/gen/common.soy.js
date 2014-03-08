@@ -6,5 +6,5 @@ if (typeof common.templates == 'undefined') { common.templates = {}; }
 
 
 common.templates.titleboard = function(opt_data, opt_ignored) {
-  return '<div class="titleboard"><div class="titleboard-text">' + soy.$$filterNoAutoescape(opt_data.contents) + '</div></div>';
+  return '<div class="titleboard"><div class="titleboard-t ext">' + soy.$$filterNoAutoescape(opt_data.contents) + '</div></div>';
 };
