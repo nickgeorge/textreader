@@ -135,14 +135,6 @@ class Indexer:
 
     return bookId
 
-  def deleteFromBooks(self, title, author):
-    self.cursor.execute('SELECT book_id FROM books WHERE ' +
-        'title=\'%s\' AND author=\'%s\'' % (title, author))
-
-    for row in self.cursor.fetchall():
-      self.deleteFromIndexes(row[0], deleteFromBooks=True)
-      self.tracer.log(str(row[0]))
-
   def deleteFromTmpBooks(self, title, author):
     self.cursor.execute('SELECT tmp_id FROM tmp_books WHERE ' +
         'title=\'%s\' AND author=\'%s\'' % (title, author))
@@ -150,4 +142,3 @@ class Indexer:
     for row in self.cursor.fetchall():
       self.cursor.execute('DELETE FROM tmp_books WHERE tmp_id=%s' % row[0])
       self.tracer.log(str(row[0]))
-
