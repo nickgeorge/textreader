@@ -6,6 +6,7 @@ import MySQLdb
 import flaf_tracer
 cgitb.enable()
 
+
 """
   Creates a database connection.  I *think* this should be limited to one per
   thread, but I'm not sure how much it matters.
@@ -15,12 +16,10 @@ def newConn():
   with file('/Users/nickgeorge/pwd/password.txt', 'r') as f:
       pw = f.read()
 
-  return MySQLdb.connect(host='localhost',
+  return MySQLdb.connect(host='www.biologicalspeculation.com',
     user='textreader',
     passwd= pw.strip(' \n'),
     db='flaf')
-    #charset = "utf8",
-    #use_unicode = True)
 
 """
   Data-access object (dao) for accessing mysql database.
@@ -202,7 +201,7 @@ class DbDao:
         'WHERE COALESCE(common, FALSE) IS FALSE ' +
             'AND COALESCE(pronoun, FALSE) IS FALSE ' +
             'AND book_id = %s ' % bookId +
-        'ORDER BY count DESC, word ASC LIMIT %s, %s' % (startIndex + 1, count))
+        'ORDER BY count DESC, word ASC LIMIT %s, %s' % (startIndex, count))
 
     wordCounts = [];
     for row in self.cursor.fetchall():

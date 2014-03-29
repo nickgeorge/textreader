@@ -52,12 +52,14 @@ elif action == 'crawl':
   urllib2.install_opener(opener)
 
   rawText = urllib2.urlopen(gutenbergUrl % (gutId, gutId)).read()
+  tracer.log("here");
 
   startIndex = re.search('^\*\*\* START [^\*]*\*\*', rawText, re.MULTILINE).end()
   endIndex = re.search('^\*\*\* END [^\*]*\*\*', rawText, re.MULTILINE).start()
 
   preamble = rawText[:startIndex]
   text = rawText[startIndex:endIndex]
+  tracer.log(text);
 
   producedMatch = re.search('^Produced by.*', text, re.MULTILINE)
   if producedMatch and producedMatch.start() < 20:
@@ -100,7 +102,7 @@ elif action == 'save':
   author = form.getvalue('author') or ''
 
   indexer = flaf_indexer.Indexer(conn)
-  indexer.deleteFromBooks(title, author)
+  indexer.findAndDeleteFromIndexes(title, author)
   indexer.saveBookFromTmp(tmpId, title, author)
 
   doc.bodyLine('''

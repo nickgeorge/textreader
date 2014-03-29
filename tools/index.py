@@ -22,11 +22,18 @@ parser.add_argument('--author',
     help='The author of the book to add.')
 parser.add_argument('--title',
     help='The title of the book to add.')
-parser.add_argument('--gut_id',
-    help='The path of the book to add.', type=int, dest='gutId')
+parser.add_argument('--text_path',
+    help='The path of the book to add.', dest='textPath')
 
 args = parser.parse_args()
 indexer = flaf_indexer.Indexer(flaf_db.newConn())
+
+if args.action == 'delete':
+  if args.bookId is None:
+    print('Error: --book_id must be set to delete.')
+    sys.exit(1)
+  indexer.deleteFromIndexes(args.bookId)
+
 
 if args.action == 'reindex':
   if args.bookId is None:
@@ -37,10 +44,13 @@ if args.action == 'reindex':
   indexer.addToIndexes(args.bookId)
 
 if args.action == 'add':
-  if args.gutId is None or args.author is None or args.title is None:
-    print('Error: --gut_id, --author, --title must be set to add book.')
+  if args.textPath is None or args.author is None or args.title is None:
+    print('Error: --text_path, --author, --title must be set to add book.')
     sys.exit(1)
 
-    indexer.indexByGutenbergId(args.gutId, args.title, args.author)
-
+  textFile = open(args.textPath, 'r')
+  text = textFile.read()
+  bookId = indexer.addToBooksByText(args.title, args.author, text)
+  indexer.addToIndexes(bookId);
+  
 

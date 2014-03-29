@@ -15,5 +15,5 @@ class Tracer:
     sys.stderr.write('%s:\t%s - %s\n' % (
       int((time.time() - Tracer.startTime) * 1000),
       self.name,
-      msg.encode('utf8')
+      msg.encode('ascii', 'replace')
     ))

@@ -12,7 +12,7 @@ menu.templates.main = function(opt_data, opt_ignored) {
   for (var optionIndex82 = 0; optionIndex82 < optionListLen82; optionIndex82++) {
     var optionData82 = optionList82[optionIndex82];
     output += '<div class="menu-item menu-item-' + soy.$$escapeHtml(optionIndex82) + '" data-index="' + soy.$$escapeHtml(optionIndex82) + '">';
-    var charList88 = optionData82.text;
+    var charList88 = optionData82.text != null ? optionData82.text : '';
     var charListLen88 = charList88.length;
     for (var charIndex88 = 0; charIndex88 < charListLen88; charIndex88++) {
       var charData88 = charList88[charIndex88];

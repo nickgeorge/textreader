@@ -42,11 +42,12 @@ Hovercard.prototype.setOffset = function(offset) {
   this.offset = offset;
 };
 
-Hovercard.prototype.showOnHover = function(elementOrArray,
-    opt_anchorChangeCallback) {
-  var elements = elementOrArray.length ? elementOrArray : [elementOrArray];
+Hovercard.prototype.showOnHover = function(elements,
+    opt_anchorChangeCallback, opt_ctx) {
+  var ctx = opt_ctx || this;
   if (opt_anchorChangeCallback) {
-    this.anchorChangeCallback = opt_anchorChangeCallback;
+    this.anchorChangeCallback = 
+        util.bind(opt_anchorChangeCallback, ctx);
   }
   this.listenAll(elements, 'mouseenter', this.onHover);
   this.listenAll(elements, 'mouseleave', this.onHover);
@@ -59,22 +60,17 @@ Hovercard.prototype.setContent = function(component) {
 
 Hovercard.prototype.onHover = function(event) {
   var isSameElement = event.target == this.anchor;
-  if (!isSameElement) {
-    this.anchor = event.target;
-    this.anchorChangeCallback(this.anchor);
-  }
   if (event.type == 'mouseenter') {
-    if (this.visible) {
-      if (isSameElement) {
-        this.isHovered = true;
-        return;
-      }
-      this.hide();
+    this.isHovered = true;
+    if (!this.visible || !isSameElement) {
+      this.anchor = event.target;
+      this.anchorChangeCallback(this.anchor);
+      this.isHovered = true; 
+      this.show();
     }
-    this.show();
   } else if (isSameElement){
-      this.isHovered = false;
-      setTimeout(util.bind(this.maybeHide, this), 75);
+    this.isHovered = false;
+    setTimeout(util.bind(this.maybeHide, this), 75);
   }
 };
 
@@ -89,7 +85,6 @@ Hovercard.prototype.onContentHover = function(event) {
 
 Hovercard.prototype.show = function() {
   this.isHovered = true;
-  if (this.visible) return;
   this.visible = true;
   $(this.getContentElement()).show();
   var anchorPosition = $(this.anchor).offset();
@@ -97,11 +92,15 @@ Hovercard.prototype.show = function() {
   $(this.getContentElement()).css('top', anchorPosition.top +
       $(this.anchor).height() - $(window).scrollTop() + this.offset.top);
   $(this.getContentElement()).css('left', anchorPosition.left + this.offset.left);
+
+  this.anchorChangeCallback(this.anchor);  
 };
 
 Hovercard.prototype.hide = function() {
   $(this.getContentElement()).hide();
   this.visible = false;
+
+  this.anchorChangeCallback(null);  
 };
 
 Hovercard.prototype.maybeHide = function() {

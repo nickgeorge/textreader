@@ -8,7 +8,7 @@
     {foreach $option in $options}
       <div class="menu-item menu-item-{index($option)}"
           data-index="{index($option)}">
-        {foreach $char in $option.text}
+        {foreach $char in $option.text ?: ''}
           {if $option.indices and $option.indices[index($char)]}
             <span class="highlight-char">{$char}</span>
           {else}

@@ -71,11 +71,20 @@ util.base = function(me, opt_methodName, var_args) {
   }
 };
 
+util.requiredPaths_ = [];
 util.require = function(path) {
+  if (util.requiredPaths_.indexOf(path) != -1) {
+    return;
+  }
+  util.requiredPaths_.push(path);
   document.write('<script src="/' + path + '"></script>')
 };
 
 util.useCss = function(path) {
+  if (util.requiredPaths_.indexOf(path) != -1) {
+    return;
+  }
+  util.requiredPaths_.push(path);
   document.write(
       '<link rel="stylesheet" type="text/css" href="/' + path + '">');
 };
@@ -185,7 +194,11 @@ util.dom.removeClass = function(element, cssClass) {
 
 // n.b. This will only work for nodes that have parents.
 util.dom.matches = function(element, selector) {
-  return util.dom.findAll(selector, element.parent).
+  if (!element.parentElement) {
+    throw new Error('Cannot invoke util.dom.matches ' +
+        'on a node with no parent.');
+  }
+  return util.dom.findAll(selector, element.parentElement).
       indexOf(element) != -1;
 };
 

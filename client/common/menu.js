@@ -6,7 +6,7 @@ Menu = function(options) {
 
   this.options = options;
   this.highlitIndex = 0;
-  this.hovercard = null;
+  this.hovercard = new Hovercard();
 };
 util.inherits(Menu, Component);
 
@@ -19,8 +19,38 @@ util.inherits(Menu, Component);
  */
 Menu.options;
 
+Menu.prototype.initialize = function() {
+  this.hovercard.initialize();
+  this.hovercard.setContent(this);
+};
+
+Menu.prototype.setAnchor = function(element) {
+  this.hovercard.setAnchor(element);
+};
+
+Menu.prototype.getAnchor = function() {
+  return this.hovercard ? this.hovercard.getAnchor() : null;
+};
+
+Menu.prototype.isVisible = function() {
+  return this.hovercard.isVisible();
+};
+
+Menu.prototype.hide = function() {
+  this.hovercard.hide();
+};
+
+Menu.prototype.show = function() {
+  this.hovercard.show();
+};
+
 Menu.prototype.setOptions = function(options) {
   this.options = options;
+  this.buildMenuOptions();
+};
+
+Menu.prototype.setOption = function(option, index) {
+  this.options[index] = option;
   this.buildMenuOptions();
 };
 
@@ -51,10 +81,6 @@ Menu.prototype.setHovercard = function(hovercard) {
   this.hovercard = hovercard;
 };
 
-Menu.prototype.getAnchor = function() {
-  return this.hovercard ? this.hovercard.getAnchor() : null;
-};
-
 Menu.prototype.listenForKeys = function(element, callback) {
   callback = callback || function(){};
   this.listen(element, 'keydown', function(event) {
@@ -75,10 +101,12 @@ Menu.prototype.listenForKeys = function(element, callback) {
       case util.events.KeyCodes.BACKSPACE:
         if (element.value == '') {
           this.firePop();
+        } else {
+          preventDefault = false;
         }
-        preventDefault = false;
         break;
       case util.events.KeyCodes.ESC:
+        this.hide();
         break;
       default:
         preventDefault = false;

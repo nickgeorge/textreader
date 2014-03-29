@@ -38,7 +38,7 @@ ListPage.prototype.createDom = function(contentElement) {
   this.searchbar.render(this.find('#search-bar-container'));
   this.searchbar.setWord(this.word);
   this.searchbar.setSelectedBookIds(this.bookIds);
-  
+
   this.listenAll(this.findAll('.context-section-expander'),
       'click', this.onExpanderClicked);
 
@@ -46,7 +46,7 @@ ListPage.prototype.createDom = function(contentElement) {
   this.hovercard.setContent(this.menu);
   this.menu.setHovercard(this.hovercard);
   this.hovercard.setOffset({top: -4, left: 0});
-  this.hovercard.showOnHover(this.find('.book-title'));
+  this.hovercard.showOnHover([this.find('.book-title')]);
 
   this.listen(this.menu, Menu.EventType.SELECT, this.onMenuSelect);
 

@@ -25,6 +25,7 @@ WordMapPage = function(data) {
 };
 util.inherits(WordMapPage, Component);
 
+
 WordMapPage.prototype.createDom = function() {
   soy.renderElement(this.getContentElement(), wordmap.templates.main, {
     booksData: this.booksData,
@@ -47,8 +48,8 @@ WordMapPage.prototype.createDom = function() {
   var bookNodes = this.findAll('.node-book');
   bookNodes.forEach(function(element, index) {
     var angle = Math.PI * 2 * index / count;
-    element.style.left = centerX + 300 * Math.cos(angle) + 'px';
-    element.style.top = centerY + 300 * Math.sin(angle) + 'px';
+    element.style.left = centerX + 250 * Math.cos(angle) + 'px';
+    element.style.top = centerY + 250 * Math.sin(angle) + 'px';
   });
 
   for (var i = 0; i < bookNodes.length; i++) {
@@ -65,13 +66,13 @@ WordMapPage.prototype.createDom = function() {
   this.hovercard.setOffset({top: -19, left: -95});
 
   this.listen(this.menu, Menu.EventType.SELECT, function(event){
-        var word = util.dom.getData(event.anchor, 'word');
-        window.location.href = '/search?bookIds=' +
-            this.selectedBookIds.join(',') +
-            '&word=' + word;
+    var word = util.dom.getData(event.anchor, 'word');
+    window.location.href = '/search?bookIds=' +
+        this.selectedBookIds.join(',') +
+        '&word=' + word;
   });
-
 };
+
 
 WordMapPage.prototype.onMapClick = function(event) {
   element = event.target;
@@ -129,8 +130,11 @@ WordMapPage.prototype.buildMiddleNode = function(i, j) {
   newNode.style['-webkit-transform'] = 'rotate(' + angle + 'rad)';
 };
 
+
 WordMapPage.prototype.updateHover = function(anchor) {
   util.array.forEach(this.findAll('.word-list-item-hover'),
       util.fn.removeClass('word-list-item-hover'));
-  util.dom.addClass(anchor, 'word-list-item-hover');
+  if (anchor) {
+    util.dom.addClass(anchor, 'word-list-item-hover');
+  }
 };

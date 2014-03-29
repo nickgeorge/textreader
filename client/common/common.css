@@ -4,6 +4,11 @@ body {
   overflow-x: hidden;
 }
 
+input[type="text"] {
+  border: 1px solid #888888;
+  height: 15px;
+}
+
 .keyword {
   color: #2222D2;
   font-weight: bold;
@@ -23,6 +28,8 @@ body {
   margin: 20px auto 20px auto;
   padding: 4px 5px 7px 5px;
   box-shadow: 1px 1px 1px #888888;
+  border-top: 1px solid #CCC;
+  border-left: 1px solid #CCC;
   max-width: 750px;
 }
 
@@ -59,7 +66,5 @@ body {
   width: 600px;
   padding: 5px 5px 5px 5px;
   text-align: center;
-  background-color: white;
   margin: 0px auto 0px auto;
-  box-shadow: 1px 1px 1px #888888;
 }

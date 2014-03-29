@@ -22,6 +22,6 @@ EventSource.prototype.listen = function(src, type, handler, opt_ctx) {
 
 EventSource.prototype.listenAll = function(srcs, type, handler, opt_ctx) {
   util.array.forEach(srcs, function(src) {
-    src.addEventListener(type, util.bind(handler, opt_ctx || this));
+    this.listen(src, type, handler, opt_ctx);
   }, this);
 };

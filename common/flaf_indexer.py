@@ -39,14 +39,12 @@ class Indexer:
 
 
   def deleteFromIndexes(self, bookId, deleteFromBooks=False):
+    self.tracer.log("Deleting book %s from indexes" % bookId)
     self.cursor.execute('DELETE FROM word_index WHERE book_id = %s' % bookId);
     self.cursor.execute('DELETE FROM word_counts WHERE book_id = %s' % bookId);
     if deleteFromBooks:
       self.cursor.execute('DELETE FROM books WHERE book_id = %s' % bookId)
     self.conn.commit()
-
-  # def deleteBookByTitleAndAuthor(self, title, author):
-  #   self.cursor.execute(
 
   def addToIndexes(self, bookId):
     self.cursor.execute('SELECT text FROM books WHERE book_id=' + str(bookId))
@@ -134,6 +132,15 @@ class Indexer:
     self.addToIndexes(bookId)
 
     return bookId
+
+  def findAndDeleteFromIndexes(self, title, author):
+    self.cursor.execute('SELECT book_id FROM books WHERE ' +
+        'title=\'%s\' AND author=\'%s\'' % (title, author))
+
+    for row in self.cursor.fetchall():
+      self.deleteFromIndexes(row[0], deleteFromBooks=True)
+      self.tracer.log("Deleting old book with title: %s, author:%s"
+          % (title, author))
 
   def deleteFromTmpBooks(self, title, author):
     self.cursor.execute('SELECT tmp_id FROM tmp_books WHERE ' +

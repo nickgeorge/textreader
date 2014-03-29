@@ -13,12 +13,13 @@
 {/template}
 
 /**
- * @param titles
+ * @param blockData
  */
 {template .selectedblocks}
-  {foreach $title in $titles}
-    <div class="search-bar-selected-block">
-      {$title}
+  {foreach $block in $blockData}
+    <div class="search-bar-selected-block"
+        data-book-id="{$block.bookId}">
+      {$block.text}
     </div>
   {/foreach}
 {/template}

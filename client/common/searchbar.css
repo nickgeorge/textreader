@@ -18,14 +18,21 @@
 
 #search-bar-book {
   width: 200px;
+  vertical-align: middle;
 }
 
 #search-bar-selected-books {
-  margin-left: 5px;
-  margin-right: 5px;
-  padding-left: 4px;
   display: inline-block;
   font-size: 80%;
+}
+
+
+.search-bar-selected-block {
+  display: inline-block;
+  border: 1px solid rgb(160, 0, 147);
+  background-color: rgb(255, 184, 255);
+  margin-left: 1px;
+  padding: 1px;
 }
 
 #search-bar-book-input {
@@ -40,4 +47,9 @@
   margin-left: 5px;
   margin-right: 5px;
   padding-left: 4px;
+  vertical-align: middle;
+}
+
+#search-bar-button {
+  vertical-align: middle;
 }
