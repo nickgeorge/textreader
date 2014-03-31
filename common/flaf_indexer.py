@@ -135,7 +135,10 @@ class Indexer:
 
   def findAndDeleteFromIndexes(self, title, author):
     self.cursor.execute('SELECT book_id FROM books WHERE ' +
-        'title=\'%s\' AND author=\'%s\'' % (title, author))
+        'title=\'%s\' AND author=\'%s\'' % (
+          self.conn.escape_string(title),
+          self.conn.escape_string(author)
+        ))
 
     for row in self.cursor.fetchall():
       self.deleteFromIndexes(row[0], deleteFromBooks=True)

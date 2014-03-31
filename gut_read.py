@@ -52,14 +52,14 @@ elif action == 'crawl':
   urllib2.install_opener(opener)
 
   rawText = urllib2.urlopen(gutenbergUrl % (gutId, gutId)).read()
-  tracer.log("here");
+  tracer.log(rawText);
 
   startIndex = re.search('^\*\*\* START [^\*]*\*\*', rawText, re.MULTILINE).end()
   endIndex = re.search('^\*\*\* END [^\*]*\*\*', rawText, re.MULTILINE).start()
 
   preamble = rawText[:startIndex]
   text = rawText[startIndex:endIndex]
-  tracer.log(text);
+  #tracer.log(text);
 
   producedMatch = re.search('^Produced by.*', text, re.MULTILINE)
   if producedMatch and producedMatch.start() < 20:

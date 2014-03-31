@@ -1,8 +1,6 @@
 #!/usr/bin/python
 
-import cgitb
 import sys, time
-cgitb.enable()
 
 class Tracer:
   startTime = time.time()
@@ -15,5 +13,5 @@ class Tracer:
     sys.stderr.write('%s:\t%s - %s\n' % (
       int((time.time() - Tracer.startTime) * 1000),
       self.name,
-      msg.encode('ascii', 'replace')
+      msg
     ))

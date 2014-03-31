@@ -79,12 +79,14 @@ Searchbar.prototype.onBookBlockMenuSelect = function(menuEvent) {
   var bookId = Number(util.dom.getData(menuEvent.anchor, 'bookId'));
   util.array.remove(this.selectedBookIds, bookId);
   this.renderSelectedBooks();
+  this.bookBlockMenu.hide();
 };
 
 Searchbar.prototype.updateHover = function(anchor) {
+  if (!anchor) return;
   var bookId = util.dom.getData(anchor, 'bookId');
   this.bookBlockMenu.setOption({
-    text: 'Remove' + this.books[bookId].title, 
+    text: 'Remove ' + this.books[bookId].title, 
     value: 'remove'
   }, 0);
 };

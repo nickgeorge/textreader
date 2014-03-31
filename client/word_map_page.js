@@ -120,10 +120,12 @@ WordMapPage.prototype.buildMiddleNode = function(i, j) {
   var nodeB = this.find('.node-book-' + this.bookIds[j]);
   var newNode = this.find('.node-' + nodeName + '-' + suffix);
 
+  var distance = Math.sqrt((nodeA.left)
+
   newNode.style.left = (parseInt(nodeA.style.left) +
-      parseInt(nodeB.style.left)) / 2 + 'px'
+      parseInt(nodeB.style.left)) / 2 + 'px';
   newNode.style.top = (parseInt(nodeA.style.top) +
-      parseInt(nodeB.style.top)) / 2 + 'px'
+      parseInt(nodeB.style.top)) / 2 + 'px';
 
   var angle = Math.atan2(parseInt(nodeA.style.top) - parseInt(nodeB.style.top),
       parseInt(nodeA.style.left) - parseInt(nodeB.style.left));

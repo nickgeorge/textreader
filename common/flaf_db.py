@@ -1,10 +1,9 @@
 #!/usr/bin/python3
 
 import flaf_types
-import cgitb,sys
+import sys
 import MySQLdb
 import flaf_tracer
-cgitb.enable()
 
 
 """
@@ -20,6 +19,23 @@ def newConn():
     user='textreader',
     passwd= pw.strip(' \n'),
     db='flaf')
+
+
+"""
+  Thin wrapper around cursor that logs all commands before executing them.
+"""
+class LoggingCursor:
+  def __init__(self, conn):
+    self.conn = conn
+    self.cursor = conn.cursor()
+    self.tracer = flaf_tracer.Tracer('LoggingCursor')
+
+  def execute(self, cmd):
+    self.tracer.log(cmd)
+    self.cursor.execute(cmd)
+
+  def fetchall(self):
+    return self.cursor.fetchall()
 
 """
   Data-access object (dao) for accessing mysql database.
@@ -52,7 +68,7 @@ class DbDao:
     self.cursor.execute('SELECT book_id, position, word, raw FROM word_index ' +
         'WHERE position BETWEEN %s AND %s ' % (start, end) +
         'AND raw IS NOT NULL ' +
-        'AND book_id ="%s" ' % bookId +
+        'AND book_id="%s" ' % bookId +
         'ORDER BY position')
     tokens = []
     for row in self.cursor.fetchall():

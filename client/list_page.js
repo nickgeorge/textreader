@@ -46,7 +46,7 @@ ListPage.prototype.createDom = function(contentElement) {
   this.hovercard.setContent(this.menu);
   this.menu.setHovercard(this.hovercard);
   this.hovercard.setOffset({top: -4, left: 0});
-  this.hovercard.showOnHover([this.find('.book-title')]);
+  this.hovercard.showOnHover(this.findAll('.book-title'));
 
   this.listen(this.menu, Menu.EventType.SELECT, this.onMenuSelect);
 

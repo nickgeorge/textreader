@@ -32,7 +32,7 @@ if args.action == 'delete':
   if args.bookId is None:
     print('Error: --book_id must be set to delete.')
     sys.exit(1)
-  indexer.deleteFromIndexes(args.bookId)
+  indexer.deleteFromIndexes(args.bookId, deleteFromBooks=True)
 
 
 if args.action == 'reindex':

@@ -28,6 +28,7 @@ common = [
   "be",
   "by",
   "who",
+  "what",
   "had",
   "but",
   "from",

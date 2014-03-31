@@ -33,6 +33,7 @@ WordCountsPage.prototype.createDom = function() {
 
   this.searchbar = new Searchbar(this.books);
   this.searchbar.render(this.find('#search-bar-container'));
+  this.searchbar.setSelectedBookIds([this.bookId]);
 
   this.findAll('.word-count-bar').slice(0, 50).forEach(function(element) {
     element.style.transition = 'width .6s cubic-bezier(.4,.1,.46,.1)';
