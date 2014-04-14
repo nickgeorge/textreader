@@ -3,9 +3,9 @@
 import cgi, cgitb
 import json
 from common import flaf_db
-from common import list_dao
-from common import flaf_types
 from common import flaf_tracer
+from common import flaf_types
+from common import list_dao
 from common import document
 
 cgitb.enable()

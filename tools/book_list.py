@@ -17,7 +17,7 @@ from common import colors
 parser = argparse.ArgumentParser(
     description='Tool manipulating lists of books.')
 parser.add_argument('action',
-    help='The action to take.')
+    help='Options: create, add, delete')
 parser.add_argument('--book_ids',
     help='Comma-delimited list of book ids to add/remove.', dest="bookIds")
 parser.add_argument('--label',
@@ -31,6 +31,7 @@ if args.action == 'create':
 
   util.dieIfNotNone(listDao.getListId(label),
      'Cannot create list [%s], list already exists.' % label)
+
 
   listDao.createList(label)
 

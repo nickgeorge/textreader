@@ -120,7 +120,7 @@ WordMapPage.prototype.buildMiddleNode = function(i, j) {
   var nodeB = this.find('.node-book-' + this.bookIds[j]);
   var newNode = this.find('.node-' + nodeName + '-' + suffix);
 
-  var distance = Math.sqrt((nodeA.left)
+  // var distance = Math.sqrt((nodeA.left)
 
   newNode.style.left = (parseInt(nodeA.style.left) +
       parseInt(nodeB.style.left)) / 2 + 'px';

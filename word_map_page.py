@@ -2,20 +2,31 @@
 
 import cgi, cgitb
 import json
-from common import flaf_db
-from common import flaf_types
-from common import flaf_tracer
 from common import document
+from common import flaf_db
+from common import flaf_tracer
+from common import flaf_types
+from common import list_dao
+from common import util
 
 cgitb.enable()
 tracer = flaf_tracer.Tracer('WordMapAction')
 
 form = cgi.FieldStorage()
-bookIds = map(int, form.getvalue('bookIds').split(','))
+bookIdsString = form.getvalue('bookIds')
+bookIds = map(int, bookIdsString.split(',')) if bookIdsString else None
+listId = form.getvalue('listId')
 
 conn = flaf_db.newConn()
 dbDao = flaf_db.DbDao(conn)
 cursor = conn.cursor()
+
+if listId is not None:
+  listDao = list_dao.ListDao(conn)
+  bookIds = listDao.getBooksInList(listId)
+
+util.dieIfNone(bookIds, 'No book ids specified.')
+
 
 # tracer.log('Looking for [%s] in book %s' % (word, bookId))
 
