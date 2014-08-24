@@ -14,7 +14,7 @@ tracer = flaf_tracer.Tracer('ListPageAction')
 """
   The main action for rendering the ListPage (textreader/).
   Gets a list of all instances of a word in a book, and then gets a context for
-  the first 30.  The remaining books will be loaded via ajax from the
+  the first 30.  The remaining contexts will be loaded via ajax from the
   client side js.
 
   Expects:
